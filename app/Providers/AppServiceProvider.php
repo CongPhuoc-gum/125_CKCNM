@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        \Illuminate\Http\Resources\Json\JsonResource::withoutWrapping();
+        if (app()->environment('local', 'development')) {
+            \Illuminate\Http\Resources\Json\JsonResource::$wrap = null;
+        }
     }
 }

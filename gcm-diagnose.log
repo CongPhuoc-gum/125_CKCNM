@@ -1,0 +1,218 @@
+﻿Diagnose log at 2025-12-27T15:16:58Z
+
+AppPath: D:\Git\mingw64\bin\git-credential-manager.exe
+InstallDir: D:\Git\mingw64\bin\
+Version: 2.6.1+786ab03440ddc82e807a97c0e540f5247e44cec6
+
+------------
+Diagnostic: Environment
+Skipped: False
+Success: True
+Exception: None
+Log:
+OSType: Windows
+OSVersion: 10.0 (build 26100)
+Reading environment variables... OK
+ Variables:
+HOMEPATH=\Users\ADMIN
+DriverData=C:\Windows\System32\Drivers\DriverData
+COMPUTERNAME=LAPTOP-H6HN5RVE
+GIT_TRACE2_PARENT_SID=7ffac53b-5b28-490a-8e38-79b7844d42f4
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+_CONDA_EXE=C:\Users\ADMIN\Miniconda3\Scripts\conda.exe
+OneDrive=C:\Users\ADMIN\OneDrive
+CONDA_PYTHON_EXE=C:\Users\ADMIN\Miniconda3\python.exe
+CONDA_DEFAULT_ENV=base
+RegionCode=APJ
+__CONDA_OPENSLL_CERT_FILE_SET=1
+MOZ_PLUGIN_PATH=C:\Program Files (x86)\Foxit Software\Foxit Reader\plugins\
+PROCESSOR_REVISION=7401
+EFC_6064_1592913036=1
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+VSCODE_INJECTION=1
+GIT_ASKPASS=d:\Antigravity\resources\app\extensions\git\dist\askpass.sh
+GIT_EXEC_PATH=D:/Git/mingw64/libexec/git-core
+TEMP=C:\Users\ADMIN\AppData\Local\Temp
+LOCALAPPDATA=C:\Users\ADMIN\AppData\Local
+MSYSTEM=MINGW64
+TERM=xterm-256color
+PROCESSOR_IDENTIFIER=AMD64 Family 25 Model 116 Stepping 1, AuthenticAMD
+VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+CONDA_EXE=C:\Users\ADMIN\Miniconda3\Scripts\conda.exe
+USERDOMAIN=LAPTOP-H6HN5RVE
+CONDA_SHLVL=1
+platformcode=M7
+PAGER=cat
+Path=D:/Git/mingw64/libexec/git-core;D:\Git\mingw64\bin;D:\Git\usr\bin;C:\Users\ADMIN\bin;C:\Users\ADMIN\Miniconda3;C:\Users\ADMIN\Miniconda3\Library\mingw-w64\bin;C:\Users\ADMIN\Miniconda3\Library\usr\bin;C:\Users\ADMIN\Miniconda3\Library\bin;C:\Users\ADMIN\Miniconda3\Scripts;C:\Users\ADMIN\Miniconda3\bin;C:\Users\ADMIN\Miniconda3\condabin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0;C:\windows\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Program Files\HP\OMEN-Broadcast\Common;C:\Program Files\HP\HP One Agent;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn;C:\Program Files\dotnet;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\Microsoft SQL Server\160\Tools\Binn;C:\Program Files\Microsoft SQL Server\160\Tools\Binn;C:\Program Files\Microsoft SQL Server\160\DTS\Binn;D:\Git\cmd;C:\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\Program Files\MySQL\MySQL Shell 8.0\bin;C:\Users\ADMIN\AppData\Local\Programs\Python\Launcher;C:\Users\ADMIN\AppData\Local\Microsoft\WindowsApps;D:\Microsoft VS Code\bin;C:\Users\ADMIN\.dotnet\tools;C:\Users\ADMIN\AppData\Local\GitHubDesktop\bin;C:\Users\ADMIN\AppData\Roaming\Composer\vendor\bin;C:\Users\ADMIN\AppData\Local\Python\bin;D:\Antigravity\bin
+TERM_PROGRAM=vscode
+PROCESSOR_LEVEL=25
+NUMBER_OF_PROCESSORS=12
+TMPDIR=C:\Users\ADMIN\AppData\Local\Temp
+VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+PROMPT=$P$G
+TERM_PROGRAM_VERSION=1.104.0
+VSCODE_GIT_ASKPASS_MAIN=d:\Antigravity\resources\app\extensions\git\dist\askpass-main.js
+ProgramFiles(x86)=C:\Program Files (x86)
+PUBLIC=C:\Users\Public
+VSCODE_GIT_IPC_HANDLE=\\.\pipe\vscode-git-16e9b9ad10-sock
+SESSIONNAME=Console
+CommonProgramFiles=C:\Program Files (x86)\Common Files
+TMP=C:\Users\ADMIN\AppData\Local\Temp
+CONDA_PROMPT_MODIFIER=(base) 
+COLORTERM=truecolor
+CHROME_CRASHPAD_PIPE_NAME=\\.\pipe\crashpad_8636_ZPTALPBDJLZAABUY
+asl.log=Destination=file
+SSL_CERT_FILE=C:\Users\ADMIN\Miniconda3\Library\ssl\cacert.pem
+PLINK_PROTOCOL=ssh
+ProgramData=C:\ProgramData
+ProgramW6432=C:\Program Files
+ProgramFiles=C:\Program Files (x86)
+ANTIGRAVITY_CLI_ALIAS=agy
+OnlineServices=Online Services
+_CONDA_ROOT=C:\Users\ADMIN\Miniconda3
+AMDRMSDKPATH=C:\Program Files\AMD\RyzenMasterSDK\
+SystemRoot=C:\WINDOWS
+ORIGINAL_XDG_CURRENT_DESKTOP=undefined
+HOME=C:\Users\ADMIN
+ANTIGRAVITY_AGENT=1
+VSCODE_GIT_ASKPASS_NODE=D:\Antigravity\Antigravity.exe
+CommonProgramW6432=C:\Program Files\Common Files
+LOGONSERVER=\\LAPTOP-H6HN5RVE
+USERPROFILE=C:\Users\ADMIN
+CONDA_PREFIX=C:\Users\ADMIN\Miniconda3
+USERDOMAIN_ROAMINGPROFILE=LAPTOP-H6HN5RVE
+APPDATA=C:\Users\ADMIN\AppData\Roaming
+HOMEDRIVE=C:
+PSModulePath=C:\Users\ADMIN\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules;C:\Program Files (x86)\Microsoft SQL Server\160\Tools\PowerShell\Modules\
+USERNAME=ADMIN
+PROCESSOR_ARCHITEW6432=AMD64
+PROCESSOR_ARCHITECTURE=x86
+OS=Windows_NT
+ComSpec=C:\WINDOWS\system32\cmd.exe
+SystemDrive=C:
+windir=C:\WINDOWS
+LANG=en_US.UTF-8
+ALLUSERSPROFILE=C:\ProgramData
+
+
+------------
+Diagnostic: File system
+Skipped: False
+Success: True
+Exception: None
+Log:
+Temporary directory is 'C:\Users\ADMIN\AppData\Local\Temp\'...
+Checking basic file I/O...
+Writing to temporary file 'C:\Users\ADMIN\AppData\Local\Temp\8f8f4b6c9ed5da660ef0e897'... OK
+Reading from temporary file 'C:\Users\ADMIN\AppData\Local\Temp\8f8f4b6c9ed5da660ef0e897'... OK
+Deleting temporary file 'C:\Users\ADMIN\AppData\Local\Temp\8f8f4b6c9ed5da660ef0e897'... OK
+Testing IFileSystem instance...
+UserHomePath: C:\Users\ADMIN
+UserDataDirectoryPath: C:\Users\ADMIN\.gcm
+GetCurrentDirectory(): C:\Users\ADMIN\Desktop\CNPM_CK\125_CKCNM
+
+------------
+Diagnostic: Networking
+Skipped: False
+Success: True
+Exception: None
+Log:
+Checking networking and HTTP stack...
+Creating HTTP client... OK
+IsNetworkAvailable: True
+Sending HEAD request to http://example.com...Sending HEAD request to https://example.com... OK
+ OK
+Acquiring free TCP port... OK
+Testing local HTTP loopback connections...
+Creating new HTTP listener for http://localhost:64916/... OK
+Waiting for loopback connection... OK
+Writing response... OK
+Waiting for response data... OK
+Loopback connection data OK
+
+------------
+Diagnostic: Git
+Skipped: False
+Success: True
+Exception: None
+Log:
+Getting Git version... OK
+Git version is '2.50.1.windows.1'
+Locating current repository...Git repository at 'C:/Users/ADMIN/Desktop/CNPM_CK/125_CKCNM/.git'
+ OK
+Listing all Git configuration... OK
+Git configuration:
+file:D:/Git/etc/gitconfig	diff.astextplain.textconv=astextplain
+file:D:/Git/etc/gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:D:/Git/etc/gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:D:/Git/etc/gitconfig	filter.lfs.process=git-lfs filter-process
+file:D:/Git/etc/gitconfig	filter.lfs.required=true
+file:D:/Git/etc/gitconfig	http.sslbackend=schannel
+file:D:/Git/etc/gitconfig	core.autocrlf=true
+file:D:/Git/etc/gitconfig	core.fscache=true
+file:D:/Git/etc/gitconfig	core.symlinks=false
+file:D:/Git/etc/gitconfig	pull.rebase=false
+file:D:/Git/etc/gitconfig	credential.helper=manager
+file:D:/Git/etc/gitconfig	credential.https://dev.azure.com.usehttppath=true
+file:D:/Git/etc/gitconfig	init.defaultbranch=master
+file:C:/Users/ADMIN/.gitconfig	filter.lfs.process=git-lfs filter-process
+file:C:/Users/ADMIN/.gitconfig	filter.lfs.required=true
+file:C:/Users/ADMIN/.gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:C:/Users/ADMIN/.gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:C:/Users/ADMIN/.gitconfig	user.name=Hoang Quoc Viet
+file:C:/Users/ADMIN/.gitconfig	user.email=viethoangquoc2004@gmail.com
+file:C:/Users/ADMIN/.gitconfig	core.autocrlf=true
+file:C:/Users/ADMIN/.gitconfig	difftool.sourcetree.cmd='' 
+file:C:/Users/ADMIN/.gitconfig	mergetool.sourcetree.cmd='' 
+file:C:/Users/ADMIN/.gitconfig	mergetool.sourcetree.trustexitcode=false
+file:C:/Users/ADMIN/.gitconfig	mergetool.sourcetree.keepbackup=false
+file:C:/Users/ADMIN/.gitconfig	credential.helperselector.selected=manager
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=false
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	core.symlinks=false
+file:.git/config	core.ignorecase=true
+file:.git/config	remote.origin.url=https://github.com/CongPhuoc-gum/125_CKCNM.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+file:.git/config	branch.main.remote=origin
+file:.git/config	branch.main.merge=refs/heads/main
+file:.git/config	branch.main.vscode-merge-base=origin/main
+file:.git/config	branch.Viet.vscode-merge-base=origin/main
+
+
+------------
+Diagnostic: Credential storage
+Skipped: False
+Success: True
+Exception: None
+Log:
+ICredentialStore instance is of type: CredentialStore
+Writing test credential... OK
+Reading test credential... OK
+Deleting test credential... OK
+
+------------
+Diagnostic: Microsoft authentication (AAD/MSA)
+Skipped: False
+Success: True
+Exception: None
+Log:
+Broker is not enabled.
+Flow type is: Auto
+Gathering MSAL token cache data... OK
+CacheDirectory: C:\Users\ADMIN\AppData\Local\.IdentityService
+CacheFileName: msal.cache
+CacheFilePath: C:\Users\ADMIN\AppData\Local\.IdentityService\msal.cache
+Creating cache helper... OK
+Verifying MSAL token cache persistence... OK
+
+------------
+Diagnostic: GitHub API
+Skipped: False
+Success: True
+Exception: None
+Log:
+Using 'https://github.com/' as API target.
+Querying '/meta' endpoint... OK
+
