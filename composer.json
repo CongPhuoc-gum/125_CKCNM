@@ -2,7 +2,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
@@ -58,6 +61,12 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        },
+        "audit": {
+            "ignore": {
+                "PKSA-8qx3-n5y5-vvnd": "Ignored for legacy support",
+                "PKSA-w7xr-vk7n-rstm": "Ignored for legacy support"
+            }
         }
     },
     "minimum-stability": "stable",
