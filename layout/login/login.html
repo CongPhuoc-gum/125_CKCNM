@@ -15,9 +15,9 @@
     <div class="form-box">
         <h2>Đăng nhập</h2>
 
-        <form>
-            <input type="text" placeholder="Email hoặc tên đăng nhập" required>
-            <input type="password" placeholder="Mật khẩu" required>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Email hoặc tên đăng nhập" required>
+            <input type="password" id="password" placeholder="Mật khẩu" required>
             <button type="submit">Đăng nhập</button>
         </form>
 
@@ -33,6 +33,23 @@
         </p>
     </div>
 </div>
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const uname = document.getElementById('username').value.trim();
+    if(!uname) {
+        alert('Vui lòng nhập tên đăng nhập hoặc email.');
+        return;
+    }
+
+    localStorage.setItem('snack_username', uname);
+
+    // ⬅️ QUAN TRỌNG
+    window.location.href = "../home/home.html";
+});
+</script>
+
 
 </body>
 </html>
