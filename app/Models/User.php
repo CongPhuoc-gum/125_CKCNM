@@ -6,9 +6,10 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Class User
@@ -30,41 +31,58 @@ use Illuminate\Database\Eloquent\Model;
  */
 class User extends Model
 {
-	protected $table = 'users';
-	protected $primaryKey = 'userId';
-	public $timestamps = false;
+    use HasApiTokens, HasFactory, Notifiable;
 
-	protected $casts = [
-		'isActive' => 'bool',
-		'createdAt' => 'datetime'
-	];
+    protected $table = 'users';
+    protected $primaryKey = 'userId';
+    public $timestamps = false;
 
-	protected $hidden = [
-		'password'
-	];
+    protected $fillable = [
+        'username',
+        'fullName',
+        'email',
+        'phone',
+        'password',
+        'googleId',
+        'role',
+        'isActive',
+        'isVerified',
+    ];
 
-	protected $fillable = [
-		'username',
-		'password',
-		'email',
-		'googleId',
-		'role',
-		'isActive',
-		'createdAt'
-	];
+    protected $hidden = [
+        'password',
+    ];
 
-	public function carts()
-	{
-		return $this->hasMany(Cart::class, 'userId');
-	}
+    protected $casts = [
+        'isActive' => 'boolean',
+        'isVerified' => 'boolean',
+        'createdAt' => 'datetime',
+    ];
 
-	public function orders()
-	{
-		return $this->hasMany(Order::class, 'userId');
-	}
+    // Relationships
+    public function carts()
+    {
+        return $this->hasMany(Cart::class, 'userId', 'userId');
+    }
 
-	public function reviews()
-	{
-		return $this->hasMany(Review::class, 'userId');
-	}
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'userId', 'userId');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'userId', 'userId');
+    }
+
+    // Helper methods
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isVerifiedUser(): bool
+    {
+        return $this->isVerified;
+    }
 }
