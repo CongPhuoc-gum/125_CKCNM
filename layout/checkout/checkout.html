@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Thanh toán | SnackFood</title>
+
+  <!-- CSS dùng chung với HOME -->
+  <link rel="stylesheet" href="../home/styles.css">
+  <!-- CSS riêng cho checkout -->
+  <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+
+<div class="site">
+
+<!-- ===== HEADER (COPY TỪ HOME) ===== -->
+<header>
+  <a class="brand" href="../home/home.html">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoV0_K78ROk_yDSrCyKON-JkXA5uWF9gxe4A&s" alt="SnackFood">
+    <div>
+      <h1>SnackFood</h1>
+      <div>Shop chuyên bán đồ khô</div>
+    </div>
+  </a>
+
+  <div class="menu-wrapper">
+    <button id="menu-toggle">
+      Danh Mục <span class="arrow">▼</span>
+    </button>
+    <div id="dropdown-menu" class="dropdown-menu">
+      <a href="../home/home.html#products" class="menu-item">🔥 Bán Chạy</a>
+      <a href="../home/home.html#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+      <a href="#" class="menu-item">🦑 Mực Khô</a>
+      <a href="#" class="menu-item">🐟 Cá Khô</a>
+      <a href="#" class="menu-item">🥜 Hạt & Snack</a>
+      <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
+      <a href="../home/home.html#contact" class="menu-item">📞 Liên Hệ</a>
+    </div>
+  </div>
+
+  <div class="search" role="search">
+    <input type="search" placeholder="Tìm kiếm sản phẩm...">
+    <button>🔎</button>
+  </div>
+
+  <button id="cart-btn">
+    🛒 <span id="cart-count">0</span>
+  </button>
+
+  <div id="user-area"></div>
+</header>
+
+<div id="dropdown-overlay"></div>
+
+<!-- ===== CHECKOUT CONTENT ===== -->
+<main class="checkout-page">
+
+  <h2 class="checkout-title">🧾 Thanh toán</h2>
+
+  <div class="checkout-container">
+
+    <!-- THÔNG TIN GIAO HÀNG -->
+    <section class="checkout-box">
+      <h3>Thông tin giao hàng</h3>
+      <input type="text" placeholder="Họ và tên" required>
+      <input type="tel" placeholder="Số điện thoại" required>
+      <input type="text" placeholder="Địa chỉ giao hàng" required>
+      <textarea placeholder="Ghi chú cho người bán (nếu có)"></textarea>
+    </section>
+
+    <!-- PHƯƠNG THỨC THANH TOÁN -->
+    <section class="checkout-box">
+      <h3>Phương thức thanh toán</h3>
+
+      <label class="pay-option">
+        <input type="radio" name="pay" checked>
+        💵 Thanh toán khi nhận hàng (COD)
+      </label>
+
+      <label class="pay-option">
+        <input type="radio" name="pay">
+        💳 Chuyển khoản ngân hàng
+      </label>
+
+      <label class="pay-option">
+        <input type="radio" name="pay">
+        📱 Ví điện tử (Momo / ZaloPay)
+      </label>
+    </section>
+
+    <!-- TÓM TẮT ĐƠN HÀNG -->
+    <section class="checkout-box summary">
+      <h3>Đơn hàng</h3>
+
+      <div class="summary-row">
+        <span>Tạm tính</span>
+        <strong>120.000₫</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Phí vận chuyển</span>
+        <strong>30.000₫</strong>
+      </div>
+
+      <div class="summary-row total">
+        <span>Tổng cộng</span>
+        <strong>150.000₫</strong>
+      </div>
+
+      <button class="confirm-btn">Xác nhận đặt hàng</button>
+        <button class="back-btn" onclick="goBackToCart()">
+        ← Quay về giỏ hàng
+        </button>
+    </section>
+<script>
+  function goBackToCart() {
+    window.location.href = "../home/home.html#cart";
+  }
+</script>
+
+  </div>
+</main>
+
+</div>
+
+<!-- ===== SCRIPT HEADER (COPY TỪ HOME) ===== -->
+<script>
+  const toggleBtn = document.getElementById('menu-toggle');
+  const dropdown = document.getElementById('dropdown-menu');
+  const overlay = document.getElementById('dropdown-overlay');
+
+  toggleBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('show');
+    overlay.classList.toggle('show');
+    toggleBtn.classList.toggle('active');
+  });
+
+  overlay.addEventListener('click', closeMenu);
+  document.addEventListener('click', closeMenu);
+
+  function closeMenu(){
+    dropdown.classList.remove('show');
+    overlay.classList.remove('show');
+    toggleBtn.classList.remove('active');
+  }
+</script>
+
+<script>
+(function(){
+  var userArea = document.getElementById('user-area');
+  var uname = localStorage.getItem('snack_username');
+
+  if(!uname){
+    window.location.href = '../login/login.html';
+    return;
+  }
+
+  userArea.innerHTML =
+    '<span style="color:#2b2b2b;font-weight:700">Xin chào, ' + uname + '</span>' +
+    '<button id="logoutBtn" style="margin-left:10px;background:linear-gradient(90deg,#ff4b2b,#e63e20);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700">Đăng xuất</button>';
+
+  document.getElementById('logoutBtn').onclick = function(){
+    localStorage.removeItem("snack_username");
+    window.location.href = "../login/login.html";
+  };
+})();
+</script>
+
+</body>
+</html>
