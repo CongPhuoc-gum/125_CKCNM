@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,7 +11,25 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+/**
+ * Class User
+ * 
+ * @property int $userId
+ * @property string|null $username
+ * @property string|null $password
+ * @property string|null $email
+ * @property string|null $googleId
+ * @property string|null $role
+ * @property bool|null $isActive
+ * @property Carbon|null $createdAt
+ * 
+ * @property Collection|Cart[] $carts
+ * @property Collection|Order[] $orders
+ * @property Collection|Review[] $reviews
+ *
+ * @package App\Models
+ */
+class User extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 

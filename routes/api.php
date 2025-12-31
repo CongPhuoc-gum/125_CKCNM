@@ -8,6 +8,8 @@ use App\Http\Controllers\AuthController;
 | API Routes
 |--------------------------------------------------------------------------
 */
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 
 // Public routes - Không cần authentication
 Route::prefix('auth')->group(function () {
@@ -38,4 +40,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::apiResource('products', ProductController::class);
     // Route::apiResource('categories', CategoryController::class);
     // ...
+});
+// Product API
+Route::apiResource('products', ProductController::class);
+
+// Category API
+Route::prefix('categories')->group(function () {
+    Route::get('', [CategoryController::class, 'index']);
+    Route::post('', [CategoryController::class, 'store']);
+    Route::get('{id}', [CategoryController::class, 'show']);
+    Route::put('{id}', [CategoryController::class, 'update']);
+    Route::delete('{id}', [CategoryController::class, 'destroy']);
 });
