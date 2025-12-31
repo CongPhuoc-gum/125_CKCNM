@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>SnackFood — Đồ khô</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="site">
@@ -240,7 +240,7 @@
   <div class="cart-total">
     Tổng cộng: <strong>120.000₫</strong>
   </div>
-  <button class="checkout-btn">Thanh toán</button>
+  <button class="checkout-btn" onclick="goCheckout()">Thanh toán</button>
   <button class="close-cart-btn">Đóng giỏ hàng</button>
   </div>
 
@@ -317,5 +317,13 @@
     }
   })();
 </script>
+
+<script>
+  function goCheckout() {
+    window.location.href = "../checkout/checkout.html";
+  }
+</script>
+<script src="js/header.js"></script>
+
 </body>
 </html>
