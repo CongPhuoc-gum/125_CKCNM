@@ -10,6 +10,8 @@ use App\Http\Controllers\AuthController;
 */
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 
 // Public routes - Không cần authentication
 Route::prefix('auth')->group(function () {
@@ -26,6 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
     });
 
+    // Các routes khác của ứng dụng sẽ thêm vào đây
+    // Route::apiResource('products', ProductController::class);
+    // Route::apiResource('categories', CategoryController::class);
+    // ...
 });
 // Product API
 Route::apiResource('products', ProductController::class);
