@@ -29,7 +29,7 @@ use Laravel\Sanctum\HasApiTokens;
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable 
 {
     use HasApiTokens, HasFactory, Notifiable;
 

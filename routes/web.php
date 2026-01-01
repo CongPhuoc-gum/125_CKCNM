@@ -13,6 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+
+Route::get('/verify-otp', function () {
+    return view('auth.verify-otp');
+})->name('verify-otp');
+
+// Trang chủ (thay đổi theo project của bạn)
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home'); // Hoặc trang chủ của bạn
+})->name('home');
