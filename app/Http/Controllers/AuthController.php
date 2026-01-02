@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Models\Cart;
 
 class AuthController extends Controller
 {
@@ -123,6 +124,10 @@ class AuthController extends Controller
                 'isVerified' => true,
                 'role' => 'user',
                 'isActive' => true,
+            ]);
+            Cart::create([
+                'userId' => $user->userId, 
+                'createdAt' => now()
             ]);
 
             // Tạo token

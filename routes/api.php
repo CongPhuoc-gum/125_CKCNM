@@ -2,13 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 */
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 
 // Public routes - Không cần authentication
@@ -24,6 +25,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+    });
+
+    // Cart routes
+    Route::prefix('cart')->group(function () {
+        Route::get('', [CartController::class, 'getCart']);
+        Route::post('/add', [CartController::class, 'addToCart']);
+        Route::put('/update/{cartItemId}', [CartController::class, 'updateQuantity']);
+        Route::post('/increase/{cartItemId}', [CartController::class, 'increaseQuantity']);
+        Route::post('/decrease/{cartItemId}', [CartController::class, 'decreaseQuantity']);
+        Route::delete('/remove/{cartItemId}', [CartController::class, 'removeItem']);
     });
 
     // Các routes khác của ứng dụng sẽ thêm vào đây
