@@ -176,4 +176,16 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Product deleted successfully']);
     }
+
+    public function bestSelling(Request $request)
+    {
+        $limit = $request->get('limit', 10);
+
+        $products = Product::withSum('orderitems', 'quantity')
+            ->orderBy('orderitems_sum_quantity', 'desc')
+            ->take($limit)
+            ->get();
+
+        return response()->json($products);
+    }
 }

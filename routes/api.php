@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ...
 });
 // Product API
+Route::get('products/best-selling', [ProductController::class, 'bestSelling']);
 Route::apiResource('products', ProductController::class);
 
 
