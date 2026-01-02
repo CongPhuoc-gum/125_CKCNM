@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>SnackFood — Đồ khô</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 </head>
 <body>
   <div class="site">
-  <header>
-      <a class="brand" href="#">
+    <header>
+      <a class="brand" href="{{ route('home') }}">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoV0_K78ROk_yDSrCyKON-JkXA5uWF9gxe4A&s" alt="SnackFood">
         <div>
           <h1>SnackFood</h1>
@@ -41,15 +41,13 @@
         🛒 <span id="cart-count">0</span>
       </button>
       
-      <div id="user-area"></div>
-    </header>
-    
-    <!-- Overlay for dropdown -->
-    <div id="dropdown-overlay"></div>
+      <div id="user-area" 
+           data-login-url="{{ route('login') }}"
+           data-register-url="{{ route('register') }}">
       </div>
+    </header>
 
-    
-    </section>
+    <div id="dropdown-overlay"></div>
 
     <main id="products">
       <h2 style="margin-top:26px">Sản phẩm nổi bật</h2>
@@ -57,7 +55,7 @@
       <div class="carousel" aria-label="Sản phẩm nổi bật">
         <button class="carousel-btn prev" aria-label="Trước">‹</button>
         <div class="carousel-track">
-          <!-- products as cards inside track -->
+
           <article class="card">
             <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Mực khô">
             <h3>Mực một nắng</h3>
@@ -77,15 +75,7 @@
               <button class="btn-sm">Thêm vào giỏ</button>
             </div>
           </article>
-<article class="card">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
-            <h3>Cá cơm sấy</h3>
-            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
-            <div class="price-row">
-              <div class="price">89.000₫ / gói</div>
-              <button class="btn-sm">Thêm vào giỏ</button>
-            </div>
-          </article>
+
           <article class="card">
             <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
             <h3>Cá cơm sấy</h3>
@@ -95,6 +85,7 @@
               <button class="btn-sm">Thêm vào giỏ</button>
             </div>
           </article>
+
           <article class="card">
             <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
             <h3>Cá cơm sấy</h3>
@@ -104,6 +95,7 @@
               <button class="btn-sm">Thêm vào giỏ</button>
             </div>
           </article>
+
           <article class="card">
             <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
             <h3>Cá cơm sấy</h3>
@@ -113,6 +105,17 @@
               <button class="btn-sm">Thêm vào giỏ</button>
             </div>
           </article>
+
+          <article class="card">
+            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
+            <h3>Cá cơm sấy</h3>
+            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
+            <div class="price-row">
+              <div class="price">89.000₫ / gói</div>
+              <button class="btn-sm">Thêm vào giỏ</button>
+            </div>
+          </article>
+
           <article class="card">
             <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Hạt">
             <h3>Hạt điều rang</h3>
@@ -146,7 +149,8 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-         <article class="card">
+
+        <article class="card">
           <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
           <h3>Snack mặn</h3>
           <div class="price-row">
@@ -154,7 +158,8 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-         <article class="card">
+
+        <article class="card">
           <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
           <h3>Snack mặn</h3>
           <div class="price-row">
@@ -162,7 +167,8 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-         <article class="card">
+
+        <article class="card">
           <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
           <h3>Snack mặn</h3>
           <div class="price-row">
@@ -170,7 +176,8 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-         <article class="card">
+
+        <article class="card">
           <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
           <h3>Snack mặn</h3>
           <div class="price-row">
@@ -178,7 +185,8 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-         <article class="card">
+
+        <article class="card">
           <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
           <h3>Snack mặn</h3>
           <div class="price-row">
@@ -186,7 +194,8 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-         <article class="card">
+
+        <article class="card">
           <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
           <h3>Snack mặn</h3>
           <div class="price-row">
@@ -194,7 +203,6 @@
             <button class="btn-sm">Thêm vào giỏ</button>
           </div>
         </article>
-        
 
         <article class="card">
           <img src="https://images.unsplash.com/photo-1606312619347-3b4f2f7f9d4e?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Gia vị">
@@ -211,119 +219,48 @@
       © <strong>SnackFood</strong> — Chuyên đồ khô chất lượng. Liên hệ: 0900 123 456 · email: info@snackfood.vn
     </footer>
   </div>
-<!-- ===== CART OVERLAY ===== -->
-<div id="cart-overlay">
-  <div class="cart-panel">
-    <div class="cart-header">
-      <h3>🛒 Giỏ hàng</h3>
-      <button id="close-cart">✕</button>
-    </div>
 
-    <div class="cart-items">
-      <!-- Item -->
-      <div class="cart-item">
-        <img src="https://langfarm-backend.s3.amazonaws.com/10.YSE_Mau%20hut%20chan%20khong%20(Thit%20kho%20an%20lien).jpg">
-        <div class="cart-info">
-          <div class="cart-name">Thịt kho ăn liền</div>
-          <div class="cart-price">120.000₫</div>
-          <div class="cart-qty">
-            <button>-</button>
-            <span>1</span>
-            <button>+</button>
+  <div id="cart-overlay">
+    <div class="cart-panel">
+      <div class="cart-header">
+        <h3>🛒 Giỏ hàng</h3>
+        <button id="close-cart">✕</button>
+      </div>
+
+      <div class="cart-items">
+        <!-- Item -->
+        <div class="cart-item">
+          <img src="https://langfarm-backend.s3.amazonaws.com/10.YSE_Mau%20hut%20chan%20khong%20(Thit%20kho%20an%20lien).jpg">
+          <div class="cart-info">
+            <div class="cart-name">Thịt kho ăn liền</div>
+            <div class="cart-price">120.000₫</div>
+            <div class="cart-qty">
+              <button>-</button>
+              <span>1</span>
+              <button>+</button>
+            </div>
           </div>
+          <button class="remove-item">✕</button>
         </div>
-        <button class="remove-item">✕</button>
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-total">
+          Tổng cộng: <strong>120.000₫</strong>
+        </div>
+        <button class="checkout-btn" 
+                onclick="goCheckout()"
+                data-login-url="{{ route('login') }}"
+                data-checkout-url="{{ url('/checkout') }}">
+          Thanh toán
+        </button>
+        <button class="close-cart-btn">Đóng giỏ hàng</button>
       </div>
     </div>
-
-    <div class="cart-footer">
-  <div class="cart-total">
-    Tổng cộng: <strong>120.000₫</strong>
-  </div>
-  <button class="checkout-btn" onclick="goCheckout()">Thanh toán</button>
-  <button class="close-cart-btn">Đóng giỏ hàng</button>
   </div>
 
-  </div>
-</div>
-
-<script>
-  const toggleBtn = document.getElementById('menu-toggle');
-  const dropdown = document.getElementById('dropdown-menu');
-  const overlay = document.getElementById('dropdown-overlay');
-
-  toggleBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    dropdown.classList.toggle('show');
-    overlay.classList.toggle('show');
-    toggleBtn.classList.toggle('active');
-  });
-
-  overlay.addEventListener('click', closeMenu);
-  document.addEventListener('click', closeMenu);
-
-  function closeMenu(){
-    dropdown.classList.remove('show');
-    overlay.classList.remove('show');
-    toggleBtn.classList.remove('active');
-  }
-</script>
-<script>
-  const cartBtn = document.getElementById('cart-btn');
-  const cartOverlay = document.getElementById('cart-overlay');
-  const closeCart = document.getElementById('close-cart');
-  const closeCartBtn = document.querySelector('.close-cart-btn');
-
-  cartBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    cartOverlay.classList.add('show');
-  });
-
-  closeCart.addEventListener('click', function () {
-    cartOverlay.classList.remove('show');
-  });
-
-  closeCartBtn.addEventListener('click', function () {
-    cartOverlay.classList.remove('show');
-  });
-
-  cartOverlay.addEventListener('click', function (e) {
-    if (e.target === cartOverlay) {
-      cartOverlay.classList.remove('show');
-    }
-  });
-</script>
-
-
-<script>
-  (function(){
-    var userArea = document.getElementById('user-area');
-    var uname = localStorage.getItem('snack_username');
-    if(!uname){
-      window.location.href = '../login/login.html';
-      return;
-    }
-
-    userArea.innerHTML = ''
-      + '<span style="color:#2b2b2b;font-weight:700">Xin chào, ' + encodeHTML(uname) + '</span>'
-      + '<button id="logoutBtn" style="background:linear-gradient(90deg,#ff4b2b,#e63e20);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700">Đăng xuất</button>';
-
-    document.getElementById('logoutBtn').addEventListener('click', function(){
-      localStorage.removeItem('snack_username');
-      window.location.href = '../login/login.html';
-    });
-    function encodeHTML(s){
-      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
-    }
-  })();
-</script>
-
-<script>
-  function goCheckout() {
-    window.location.href = "../checkout/checkout.html";
-  }
-</script>
-<script src="js/header.js"></script>
+  <script src="{{ asset('js/auth.js') }}"></script>
+  <script src="{{ asset('js/header.js') }}"></script>
 
 </body>
 </html>

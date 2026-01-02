@@ -25,7 +25,6 @@ Route::get('/verify-otp', function () {
     return view('auth.verify-otp');
 })->name('verify-otp');
 
-// Trang chủ (thay đổi theo project của bạn)
 Route::get('/', function () {
-    return view('home'); // Hoặc trang chủ của bạn
+    return view('home.home');
 })->name('home');
