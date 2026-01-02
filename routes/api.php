@@ -68,3 +68,4 @@ Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 use App\Http\Controllers\ReviewController;
 Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
 Route::post('/reviews', [ReviewController::class, 'store']);
+Route::get('/stripe-return', [OrderController::class, 'stripeReturn']);
