@@ -28,3 +28,4 @@ Route::post('/checkout', [OrderController::class, 'checkout']);
 Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
 Route::get('/orders/user/{userId}', [OrderController::class, 'index']);
 Route::get('/orders/{id}', [OrderController::class, 'show']);
+Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);

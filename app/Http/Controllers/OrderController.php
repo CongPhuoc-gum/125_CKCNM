@@ -31,6 +31,25 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
+    public function cancel($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        if ($order->status !== 'pending') {
+            return response()->json(['message' => 'Cannot cancel order that is not pending'], 400);
+        }
+
+        $order->status = 'cancelled';
+        $order->save();
+        
+
+        return response()->json(['message' => 'Order cancelled successfully', 'order' => $order]);
+    }
+
     public function checkout(Request $request)
     {
         $request->validate([
