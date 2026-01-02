@@ -10,6 +10,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Product API
+Route::get('products/best-selling', [ProductController::class, 'bestSelling']);
 Route::apiResource('products', ProductController::class);
 
 
