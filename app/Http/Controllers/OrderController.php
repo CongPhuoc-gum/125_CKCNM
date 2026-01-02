@@ -107,6 +107,42 @@ class OrderController extends Controller
                 
                 $vnpUrl = $this->createVnpayUrl($order);
                 return response()->json(['message' => 'Redirect to VNPAY', 'url' => $vnpUrl], 200);
+            } elseif ($request->paymentMethod === 'stripe') {
+                Payment::create([
+                    'orderId' => $order->orderId,
+                    'method' => 'stripe',
+                    'amount' => $order->totalAmount,
+                    'status' => 'pending',
+                ]);
+                DB::commit();
+
+                // Stripe Checkout
+                \Stripe\Stripe::setApiKey(config('stripe.sk'));
+                
+                $lineItems = [];
+                foreach ($request->cartItems as $item) {
+                     
+                     $lineItems[] = [
+                        'price_data' => [
+                            'currency' => 'vnd',
+                            'product_data' => [
+                                'name' => 'Product ID: ' . $item['productId'],
+                            ],
+                            'unit_amount' => $item['price'], 
+                        ],
+                        'quantity' => $item['quantity'],
+                     ];
+                }
+
+                $session = \Stripe\Checkout\Session::create([
+                    'payment_method_types' => ['card'],
+                    'line_items' => $lineItems,
+                    'mode' => 'payment',
+                    'success_url' => url('/api/stripe-return?session_id={CHECKOUT_SESSION_ID}'),
+                    'cancel_url' => url('/api/checkout-cancel'), // Tạm
+                ]);
+
+                return response()->json(['message' => 'Redirect to Stripe', 'url' => $session->url], 200);
             }
 
 
@@ -225,6 +261,32 @@ class OrderController extends Controller
             }
         } else {
             return response()->json(['message' => 'Invalid signature'], 400);
+        }
+    }
+
+    
+    
+    public function stripeReturn(Request $request)
+    {
+        $sessionId = $request->session_id;
+        if (!$sessionId) {
+             return response()->json(['message' => 'Missing session_id'], 400);
+        }
+
+        \Stripe\Stripe::setApiKey(config('stripe.sk'));
+        
+        try {
+            $session = \Stripe\Checkout\Session::retrieve($sessionId);
+            
+            if ($session->payment_status == 'paid') {
+                 
+                 return response()->json(['message' => 'Stripe Payment successful', 'data' => $session]);
+            } else {
+                return response()->json(['message' => 'Stripe Payment failed or unpaid'], 400);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Stripe Error', 'error' => $e->getMessage()], 500);
         }
     }
 }
