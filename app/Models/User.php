@@ -21,15 +21,15 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $googleId
  * @property string|null $role
  * @property bool|null $isActive
- * @property Carbon|null $createdAt
+ * @property \Carbon\Carbon|null $createdAt
  * 
- * @property Collection|Cart[] $carts
- * @property Collection|Order[] $orders
- * @property Collection|Review[] $reviews
+ * @property \Illuminate\Support\Collection|Cart[] $carts
+ * @property \Illuminate\Support\Collection|Order[] $orders
+ * @property \Illuminate\Support\Collection|Review[] $reviews
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -73,6 +73,11 @@ class User extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class, 'userId', 'userId');
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class, 'userId', 'userId');
     }
 
     // Helper methods
