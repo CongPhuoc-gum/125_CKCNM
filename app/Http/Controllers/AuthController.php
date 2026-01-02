@@ -19,10 +19,7 @@ class AuthController extends Controller
         $this->otpService = $otpService;
     }
 
-    /**
-     * ĐĂNG KÝ - Bước 1: Nhập thông tin và gửi OTP
-     * POST /api/auth/register
-     */
+//đăng ký
     public function register(Request $request)
     {
         try {
@@ -57,10 +54,8 @@ class AuthController extends Controller
                 ], 429);
             }
 
-            // Tạo OTP
             $otp = $this->otpService->createOtp($request->email);
 
-            // Gửi OTP qua email
             $sent = $this->otpService->sendOtp($request->email, $otp->otpCode);
 
             if (!$sent) {
@@ -69,9 +64,6 @@ class AuthController extends Controller
                     'message' => 'Không thể gửi email. Vui lòng thử lại sau'
                 ], 500);
             }
-
-            // Lưu thông tin tạm vào session hoặc cache (tùy chọn)
-            // Ở đây ta sẽ để client tự lưu và gửi lại khi verify
 
             return response()->json([
                 'success' => true,
@@ -90,10 +82,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * ĐĂNG KÝ - Bước 2: Xác thực OTP và tạo tài khoản
-     * POST /api/auth/verify-otp
-     */
+//xac thực otp
     public function verifyOtp(Request $request)
     {
         try {

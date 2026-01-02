@@ -14,26 +14,16 @@ use App\Http\Controllers\ProductController;
 
 // Public routes - Không cần authentication
 Route::prefix('auth')->group(function () {
-    // Đăng ký (bước 1) - gửi OTP
     Route::post('/register', [AuthController::class, 'register']);
-    
-    // Xác thực OTP (bước 2) - hoàn tất đăng ký
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-    
-    // Gửi lại OTP
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
-    
-    // Đăng nhập
     Route::post('/login', [AuthController::class, 'login']);
 });
 
 // Protected routes - Cần authentication
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
-        // Đăng xuất
         Route::post('/logout', [AuthController::class, 'logout']);
-        
-        // Lấy thông tin user hiện tại
         Route::get('/me', [AuthController::class, 'me']);
     });
 
@@ -55,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // Product API
 Route::apiResource('products', ProductController::class);
 
+
 // Category API
 Route::prefix('categories')->group(function () {
     Route::get('', [CategoryController::class, 'index']);
@@ -63,3 +54,8 @@ Route::prefix('categories')->group(function () {
     Route::put('{id}', [CategoryController::class, 'update']);
     Route::delete('{id}', [CategoryController::class, 'destroy']);
 });
+
+// Order & Payment API
+use App\Http\Controllers\OrderController;
+Route::post('/checkout', [OrderController::class, 'checkout']);
+Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
