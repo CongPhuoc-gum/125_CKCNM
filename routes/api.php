@@ -51,3 +51,8 @@ Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
 Route::get('/orders/user/{userId}', [OrderController::class, 'index']);
 Route::get('/orders/{id}', [OrderController::class, 'show']);
 Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+
+// Review API
+use App\Http\Controllers\ReviewController;
+Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
+Route::post('/reviews', [ReviewController::class, 'store']);

@@ -14,9 +14,47 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category:categoryId,name')->paginate(10);
+        $query = Product::query();
+
+        // Tìm kiếm theo tên
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        //Lọc theo danh mục
+        if ($request->has('categoryId') && $request->categoryId != '') {
+            $query->where('categoryId', $request->categoryId);
+        }
+
+        // Lọc theo giá
+        if ($request->has('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->has('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Sắp xếp
+        if ($request->has('sort_by')) {
+            switch ($request->sort_by) {
+                case 'price_asc':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                default:
+                    $query->orderBy('productId', 'desc'); 
+                    break;
+            }
+        } else {
+            $query->orderBy('productId', 'desc');
+        }
+
+        $products = $query->with('category:categoryId,name')->paginate(10);
         return response()->json($products);
     }
 
