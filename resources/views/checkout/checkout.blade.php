@@ -6,9 +6,9 @@
   <title>Thanh toán | SnackFood</title>
 
   <!-- CSS dùng chung với HOME -->
-  <link rel="stylesheet" href="../home/styles.css">
+ <link rel="stylesheet" href="../css/home.css">
   <!-- CSS riêng cho checkout -->
-  <link rel="stylesheet" href="checkout.css">
+ <link rel="stylesheet" href="../css/checkout.css">
 </head>
 <body>
 
