@@ -12,6 +12,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Product API
 Route::apiResource('products', ProductController::class);
 
+
 // Category API
 Route::prefix('categories')->group(function () {
     Route::get('', [CategoryController::class, 'index']);
@@ -20,3 +21,8 @@ Route::prefix('categories')->group(function () {
     Route::put('{id}', [CategoryController::class, 'update']);
     Route::delete('{id}', [CategoryController::class, 'destroy']);
 });
+
+// Order & Payment API
+use App\Http\Controllers\OrderController;
+Route::post('/checkout', [OrderController::class, 'checkout']);
+Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
