@@ -28,3 +28,7 @@ Route::get('/verify-otp', function () {
 Route::get('/', function () {
     return view('home.home');
 })->name('home');
+
+Route::get('/product/{id}', function ($id) {
+    return view('product.product', ['productId' => $id]);
+})->name('product.show');
