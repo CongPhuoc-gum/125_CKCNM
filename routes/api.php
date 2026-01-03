@@ -4,15 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminDashboardController;
 
-// Public routes - Không cần authentication
+// ========== PUBLIC ROUTES ==========
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
@@ -20,14 +18,28 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Protected routes - Cần authentication
+// Products API (Public)
+Route::get('products/best-selling', [ProductController::class, 'bestSelling']);
+Route::get('products', [ProductController::class, 'index']);
+Route::get('products/{id}', [ProductController::class, 'show']);
+
+// Categories API (Public)
+Route::get('categories', [CategoryController::class, 'index']);
+Route::get('categories/{id}', [CategoryController::class, 'show']);
+
+// Reviews API (Public)
+Route::get('products/{id}/reviews', [ReviewController::class, 'index']);
+
+// ========== PROTECTED USER ROUTES ==========
 Route::middleware('auth:sanctum')->group(function () {
+    
+    // Auth
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
     });
 
-    // Cart routes
+    // Cart
     Route::prefix('cart')->group(function () {
         Route::get('', [CartController::class, 'getCart']);
         Route::post('/add', [CartController::class, 'addToCart']);
@@ -37,35 +49,47 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/remove/{cartItemId}', [CartController::class, 'removeItem']);
     });
 
-    // Các routes khác của ứng dụng sẽ thêm vào đây
-    // Route::apiResource('products', ProductController::class);
-    // Route::apiResource('categories', CategoryController::class);
-    // ...
-});
-// Product API
-Route::get('products/best-selling', [ProductController::class, 'bestSelling']);
-Route::apiResource('products', ProductController::class);
+    // Orders
+    Route::post('/checkout', [OrderController::class, 'checkout']);
+    Route::get('/orders/user/{userId}', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 
-
-// Category API
-Route::prefix('categories')->group(function () {
-    Route::get('', [CategoryController::class, 'index']);
-    Route::post('', [CategoryController::class, 'store']);
-    Route::get('{id}', [CategoryController::class, 'show']);
-    Route::put('{id}', [CategoryController::class, 'update']);
-    Route::delete('{id}', [CategoryController::class, 'destroy']);
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store']);
 });
 
-// Order & Payment API
-use App\Http\Controllers\OrderController;
-Route::post('/checkout', [OrderController::class, 'checkout']);
+// Payment callbacks
 Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
-Route::get('/orders/user/{userId}', [OrderController::class, 'index']);
-Route::get('/orders/{id}', [OrderController::class, 'show']);
-Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
-
-// Review API
-use App\Http\Controllers\ReviewController;
-Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
-Route::post('/reviews', [ReviewController::class, 'store']);
 Route::get('/stripe-return', [OrderController::class, 'stripeReturn']);
+
+// ========== ADMIN ROUTES ==========
+Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    
+    // Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    
+    // Products Management
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    
+    // Categories Management
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+    
+    // Orders Management
+    Route::get('/orders', [OrderController::class, 'adminIndex']);
+    Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+    Route::get('/orders/statistics', [OrderController::class, 'statistics']);
+    
+    // Users Management
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show']);
+    Route::put('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
+    
+    // Reviews Management
+    Route::get('/reviews', [ReviewController::class, 'adminIndex']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+});

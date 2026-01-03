@@ -17,11 +17,10 @@ function clearRegisterData() {
 
 async function handleLogin(email, password) {
     try {
-        const response = await fetch(`${API_URL}/auth/login`, {
+        const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
             },
             body: JSON.stringify({ email, password })
         });
@@ -29,33 +28,26 @@ async function handleLogin(email, password) {
         const data = await response.json();
 
         if (response.ok && data.success) {
+            // Lưu token
             localStorage.setItem('token', data.data.token);
             localStorage.setItem('user', JSON.stringify(data.data.user));
-            
-            alert('✅ ' + (data.message || 'Đăng nhập thành công!'));
-            
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
-        } else {
 
-            let errorMsg = data.message || 'Đăng nhập thất bại!';
-            
-            if (response.status === 403) {
-                if (data.message.includes('xác thực email')) {
-                    errorMsg = 'Vui lòng xác thực email trước khi đăng nhập!';
-                } else if (data.message.includes('bị khóa')) {
-                    errorMsg = 'Tài khoản của bạn đã bị khóa!';
-                }
-            } else if (response.status === 401) {
-                errorMsg = 'Email hoặc mật khẩu không đúng!';
+            alert('Đăng nhập thành công!');
+
+            // ✨ KIỂM TRA ROLE VÀ REDIRECT
+            if (data.data.user.role === 'admin') {
+                // Nếu là admin -> chuyển đến trang admin
+                window.location.href = '/admin/dashboard';
+            } else {
+                // Nếu là user thường -> về trang home
+                window.location.href = '/';
             }
-            
-            alert('❌ ' + errorMsg);
+        } else {
+            alert(data.message || 'Đăng nhập thất bại!');
         }
     } catch (error) {
-        console.error('Login error:', error);
-        alert('❌ Không thể kết nối đến server!');
+        console.error('Lỗi:', error);
+        alert('Có lỗi xảy ra khi đăng nhập!');
     }
 }
 

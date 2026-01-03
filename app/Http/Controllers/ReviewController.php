@@ -58,4 +58,47 @@ class ReviewController extends Controller
 
         return response()->json(['message' => 'Đánh giá thành công', 'data' => $review], 201);
     }
+
+    /**
+ * Lấy TẤT CẢ reviews (Admin only)
+ * GET /api/admin/reviews
+ */
+public function adminIndex(Request $request)
+{
+    $query = Review::with(['user:userId,fullName', 'product:productId,name,imageUrl']);
+
+    // Lọc theo rating
+    if ($request->filled('rating')) {
+        $query->where('rating', $request->rating);
+    }
+
+    // Tìm kiếm theo tên sản phẩm
+    if ($request->filled('search')) {
+        $query->whereHas('product', function($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $reviews = $query->orderBy('createdAt', 'desc')->paginate(15);
+
+    return response()->json([
+        'success' => true,
+        'data' => $reviews
+    ]);
+}
+
+/**
+ * Xóa review (Admin only)
+ * DELETE /api/admin/reviews/{id}
+ */
+public function destroy($id)
+{
+    $review = Review::findOrFail($id);
+    $review->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Xóa đánh giá thành công'
+    ]);
+}
 }

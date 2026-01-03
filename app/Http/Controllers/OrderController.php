@@ -289,4 +289,95 @@ class OrderController extends Controller
             return response()->json(['message' => 'Stripe Error', 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+ * Lấy TẤT CẢ đơn hàng (Admin only)
+ * GET /api/admin/orders
+ */
+public function adminIndex(Request $request)
+{
+    $query = Order::with(['user:userId,fullName,email', 'items.product:productId,name,imageUrl']);
+
+    // Lọc theo trạng thái
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Tìm kiếm theo tên khách hàng
+    if ($request->filled('search')) {
+        $query->where('customerName', 'like', '%' . $request->search . '%')
+            ->orWhere('phone', 'like', '%' . $request->search . '%');
+    }
+
+    // Lọc theo ngày
+    if ($request->filled('from_date')) {
+        $query->whereDate('createdAt', '>=', $request->from_date);
+    }
+    if ($request->filled('to_date')) {
+        $query->whereDate('createdAt', '<=', $request->to_date);
+    }
+
+    $orders = $query->orderBy('createdAt', 'desc')->paginate(15);
+
+    return response()->json([
+        'success' => true,
+        'data' => $orders
+    ]);
+}
+
+/**
+ * Cập nhật trạng thái đơn hàng (Admin only)
+ * PUT /api/admin/orders/{id}/status
+ */
+public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:pending,processing,shipping,completed,cancelled'
+    ]);
+
+    $order = Order::findOrFail($id);
+    
+    if (in_array($order->status, ['cancelled', 'completed'])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Không thể cập nhật đơn hàng đã ' . ($order->status === 'cancelled' ? 'hủy' : 'hoàn thành')
+        ], 400);
+    }
+
+    $order->status = $request->status;
+    $order->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Cập nhật trạng thái thành công',
+        'data' => $order->load('items.product')
+    ]);
+}
+
+/**
+ * Thống kê đơn hàng
+ * GET /api/admin/orders/statistics
+ */
+public function statistics(Request $request)
+{
+    $fromDate = $request->input('from_date', now()->subMonth());
+    $toDate = $request->input('to_date', now());
+
+    $stats = [
+        'total_orders' => Order::whereBetween('createdAt', [$fromDate, $toDate])->count(),
+        'pending' => Order::where('status', 'pending')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+        'processing' => Order::where('status', 'processing')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+        'shipping' => Order::where('status', 'shipping')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+        'completed' => Order::where('status', 'completed')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+        'cancelled' => Order::where('status', 'cancelled')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+        'total_revenue' => Order::whereIn('status', ['completed', 'processing', 'shipping'])
+            ->whereBetween('createdAt', [$fromDate, $toDate])
+            ->sum('totalAmount'),
+    ];
+
+    return response()->json([
+        'success' => true,
+        'data' => $stats
+    ]);
+}
 }
