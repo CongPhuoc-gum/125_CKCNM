@@ -33,6 +33,7 @@ class CartResource extends JsonResource
                             'productId' => $item->product->productId,
                             'name' => $item->product->name,
                             'price' => $item->product->price,
+                            'imageUrl' => $item->product->imageUrl,
                         ];
                     }
                     

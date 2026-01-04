@@ -46,29 +46,53 @@
 <div id="dropdown-overlay"></div>
 
 <div class="product-container">
-  <div class="breadcrumb" id="breadcrumb"></div>
+  <div class="breadcrumb" id="breadcrumb">
+    <a href="{{ route('home') }}">Trang chủ</a> > 
+    <a href="{{ route('home') }}#best">Sản phẩm</a> > 
+    <span>{{ $product->name }}</span>
+  </div>
 
   <div class="product-detail">
     <!-- IMAGE -->
     <div class="product-images">
-      <img id="mainImg">
+      <img id="mainImg" src="{{ $product->imageUrl }}" alt="{{ $product->name }}">
       <div class="thumbs" id="thumbs"></div>
     </div>
 
     <!-- INFO -->
     <div class="product-info">
-      <h1 id="name"></h1>
-      <div class="rating" id="rating"></div>
+      <h1 id="name">{{ $product->name }}</h1>
+      <div class="rating" id="rating">
+        @if($product->reviews && count($product->reviews) > 0)
+          @php
+            $avgRating = $product->reviews->avg('rating');
+            $reviewCount = count($product->reviews);
+          @endphp
+          <span>
+            @for($i = 0; $i < 5; $i++)
+              @if($i < floor($avgRating))★@else☆@endif
+            @endfor
+            ({{ number_format($avgRating, 1) }} – {{ $reviewCount }} đánh giá)
+          </span>
+        @else
+          <span>Chưa có đánh giá</span>
+        @endif
+      </div>
 
       <div class="price-box">
         <span class="old-price" id="oldPrice"></span>
-        <span class="price" id="price"></span>
+        <span class="price" id="price">{{ number_format($product->price, 2, ',', '.') }}₫</span>
         <span class="unit" id="unit"></span>
       </div>
 
-      <p class="desc" id="desc"></p>
+      <p class="desc" id="desc">{{ $product->description }}</p>
 
-      <div class="info-grid" id="info"></div>
+      <div class="info-grid" id="info">
+        <div><strong>SKU:</strong> <span>{{ $product->productId }}</span></div>
+        <div><strong>Danh mục:</strong> <span id="category">{{ $product->category->name ?? 'N/A' }}</span></div>
+        <div><strong>Tồn kho:</strong> <span>{{ $product->quantity }} sản phẩm</span></div>
+        <div><strong>Trạng thái:</strong> <span>{{ $product->status == 1 ? '✓ Còn hàng' : '✗ Hết hàng' }}</span></div>
+      </div>
 
       <div class="qty">
         <span>Số lượng:</span>
@@ -87,29 +111,24 @@
   <div class="review-section">
     <h2>Đánh giá của khách hàng</h2>
 
-    <div class="review-item">
-      <div class="review-header">
-        <strong>Nguyễn Văn A</strong>
-        <span class="stars">★★★★★</span>
-      </div>
-      <p>Mực rất ngon, mềm, đóng gói kỹ. Sẽ ủng hộ tiếp.</p>
-    </div>
-
-    <div class="review-item">
-      <div class="review-header">
-        <strong>Trần Thị B</strong>
-        <span class="stars">★★★★☆</span>
-      </div>
-      <p>Giao hàng nhanh, mực ngọt tự nhiên, hơi ít hơn mong đợi.</p>
-    </div>
-
-    <div class="review-item">
-      <div class="review-header">
-        <strong>Lê Hoàng C</strong>
-        <span class="stars">★★★★★</span>
-      </div>
-      <p>Chất lượng rất tốt, đúng như mô tả.</p>
-    </div>
+    @if($product->reviews && count($product->reviews) > 0)
+      @foreach($product->reviews as $review)
+        <div class="review-item">
+          <div class="review-header">
+            <strong>{{ $review->user->name ?? 'Ẩn danh' }}</strong>
+            <span class="stars">
+              @for($i = 0; $i < 5; $i++)
+                @if($i < $review->rating)★@else☆@endif
+              @endfor
+            </span>
+          </div>
+          <p>{{ $review->comment ?? 'Không có nhận xét' }}</p>
+          <small style="color:#999">{{ $review->createdAt->format('d/m/Y H:i') ?? '' }}</small>
+        </div>
+      @endforeach
+    @else
+      <p style="text-align:center;color:#999;padding:20px">Chưa có đánh giá nào</p>
+    @endif
   </div>
 </div>
 
@@ -250,12 +269,22 @@
   }
 </script>
 
-<!-- QUAN TRỌNG: Truyền ID từ Laravel sang JavaScript -->
+<!-- QUAN TRỌNG: Truyền product data từ Laravel sang JavaScript -->
 <script>
-  // Set product ID từ Laravel vào window object
-  window.productId = {{ $productId ?? 1 }};
+  window.productData = {
+    id: {{ $product->productId }},
+    name: "{{ $product->name }}",
+    price: {{ $product->price }},
+    description: "{{ $product->description }}",
+    imageUrl: "{{ $product->imageUrl }}",
+    quantity: {{ $product->quantity }},
+    status: {{ $product->status }},
+    categoryId: {{ $product->categoryId ?? 0 }}
+  };
 </script>
 
-<script src="{{ asset('js/product.js') }}"></script>
+<script defer src="{{ asset('js/auth.js') }}"></script>
+<script defer src="{{ asset('js/cart.js') }}"></script>
+<script src="{{ asset('js/product-detail.js') }}"></script>
 </body>
 </html>

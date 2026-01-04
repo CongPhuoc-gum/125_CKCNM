@@ -26,9 +26,14 @@ Route::get('/verify-otp', function () {
 })->name('verify-otp');
 
 Route::get('/', function () {
-    return view('home.home');
+    $products = \App\Models\Product::where('status', 1)->get();
+    return view('home.home', ['products' => $products]);
 })->name('home');
 
 Route::get('/product/{id}', function ($id) {
-    return view('product.product', ['productId' => $id]);
+    $product = \App\Models\Product::with(['category', 'reviews.user'])->find($id);
+    if (!$product) {
+        abort(404, 'Sản phẩm không tồn tại');
+    }
+    return view('product.product', ['product' => $product]);
 })->name('product.show');

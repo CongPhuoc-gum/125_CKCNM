@@ -492,10 +492,12 @@ footer#contact{
   background: rgba(0,0,0,0.4);
   display: none;
   z-index: 999;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
-#cart-overlay.show {
-  display: block;
+#cart-overlay[style*="display: flex"] {
+  display: flex !important;
 }
 
 .cart-panel {
