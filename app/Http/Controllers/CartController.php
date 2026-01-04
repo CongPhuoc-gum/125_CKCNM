@@ -148,32 +148,6 @@ class CartController extends Controller
     }
 
     /**
-     * Clear all items from cart (XÓA TOÀN BỘ GIỎ)
-     * DELETE /api/cart/clear
-     */
-    public function clearCart()
-    {
-        try {
-            $user = auth()->user();
-            $cart = $user->cart;
-
-            // Xoá tất cả cartitems
-            $cart->cartitems()->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Đã xóa toàn bộ sản phẩm khỏi giỏ hàng',
-                'data' => new CartResource($cart->load('cartitems.product'))
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Increase product quantity in cart (+1)
      * POST /api/cart/increase/{cartItemId}
      */

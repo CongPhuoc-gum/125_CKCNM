@@ -55,162 +55,37 @@
       <div class="carousel" aria-label="Sản phẩm nổi bật">
         <button class="carousel-btn prev" aria-label="Trước">‹</button>
         <div class="carousel-track">
-
-          <a href="{{ route('product.show', 1) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Mực khô">
-            <h3>Mực một nắng</h3>
-            <div style="color:#666;font-size:14px">Độ mềm vừa, tẩm gia vị truyền thống</div>
+          @forelse($products->take(7) as $product)
+          <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
+            <img src="{{ $product->imageUrl }}" alt="{{ $product->name }}">
+            <h3>{{ $product->name }}</h3>
+            <div style="color:#666;font-size:14px">{{ Str::limit($product->description, 40) }}</div>
             <div class="price-row">
-              <div class="price">199.000₫ / kg</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
+              <div class="price">{{ number_format($product->price, 2, ',', '.') }}₫</div>
+              <button class="btn-sm" onclick="event.preventDefault(); addToCart({{ $product->productId }});">Thêm vào giỏ</button>
             </div>
           </a>
-
-          <a href="{{ route('product.show', 2) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
-            <h3>Cá cơm sấy</h3>
-            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
-            <div class="price-row">
-              <div class="price">89.000₫ / gói</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-            </div>
-          </a>
-
-          <a href="{{ route('product.show', 3) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
-            <h3>Cá cơm sấy</h3>
-            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
-            <div class="price-row">
-              <div class="price">89.000₫ / gói</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-            </div>
-          </a>
-
-          <a href="{{ route('product.show', 4) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
-            <h3>Cá cơm sấy</h3>
-            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
-            <div class="price-row">
-              <div class="price">89.000₫ / gói</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-            </div>
-          </a>
-
-          <a href="{{ route('product.show', 5) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
-            <h3>Cá cơm sấy</h3>
-            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
-            <div class="price-row">
-              <div class="price">89.000₫ / gói</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-            </div>
-          </a>
-
-          <a href="{{ route('product.show', 6) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Cá khô">
-            <h3>Cá cơm sấy</h3>
-            <div style="color:#666;font-size:14px">Giòn tan, phù hợp ăn vặt</div>
-            <div class="price-row">
-              <div class="price">89.000₫ / gói</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-            </div>
-          </a>
-
-          <a href="{{ route('product.show', 7) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Hạt">
-            <h3>Hạt điều rang</h3>
-            <div style="color:#666;font-size:14px">Ngon béo, không chất bảo quản</div>
-            <div class="price-row">
-              <div class="price">149.000₫ / kg</div>
-              <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-            </div>
-          </a>
+          @empty
+          <p style="text-align:center;color:#999">Không có sản phẩm</p>
+          @endforelse
         </div>
         <button class="carousel-btn next" aria-label="Tiếp">›</button>
       </div>
 
       <h2 id="best" style="margin-top:28px">Tất cả sản phẩm</h2>
       <div class="grid" style="margin-bottom:18px">
-        <a href="{{ route('product.show', 1) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg" alt="Trái cây sấy">
-          <h3>Trái cây sấy</h3>
+        @forelse($products as $product)
+        <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
+          <img src="{{ $product->imageUrl }}" alt="{{ $product->name }}">
+          <h3>{{ $product->name }}</h3>
           <div class="price-row">
-            <div class="price">79.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
+            <div class="price">{{ number_format($product->price, 2, ',', '.') }}₫</div>
+            <button class="btn-sm" onclick="event.preventDefault(); addToCart({{ $product->productId }});">Thêm vào giỏ</button>
           </div>
         </a>
-
-        <a href="{{ route('product.show', 2) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 3) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 4) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 5) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 6) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 7) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 8) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1542736667-069246bdbc81?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Snack">
-          <h3>Snack mặn</h3>
-          <div class="price-row">
-            <div class="price">49.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
-
-        <a href="{{ route('product.show', 9) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="https://images.unsplash.com/photo-1606312619347-3b4f2f7f9d4e?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=" alt="Gia vị">
-          <h3>Gia vị khô</h3>
-          <div class="price-row">
-            <div class="price">39.000₫ / gói</div>
-            <button class="btn-sm" onclick="event.preventDefault()">Thêm vào giỏ</button>
-          </div>
-        </a>
+        @empty
+        <p style="text-align:center;color:#999">Không có sản phẩm</p>
+        @endforelse
       </div>
     </main>
 
@@ -228,28 +103,14 @@
       </div>
 
       <div class="cart-items">
-        <div class="cart-item">
-          <img src="https://langfarm-backend.s3.amazonaws.com/10.YSE_Mau%20hut%20chan%20khong%20(Thit%20kho%20an%20lien).jpg">
-          <div class="cart-info">
-            <div class="cart-name">Thịt kho ăn liền</div>
-            <div class="cart-price">120.000₫</div>
-            <div class="cart-qty">
-              <button>-</button>
-              <span>1</span>
-              <button>+</button>
-            </div>
-          </div>
-          <button class="remove-item">✕</button>
-        </div>
+        <!-- updateCartUI() sẽ render dữ liệu giỏ hàng vào đây -->
       </div>
 
       <div class="cart-footer">
         <div class="cart-total">
-          Tổng cộng: <strong>120.000₫</strong>
+          Tổng cộng: <strong>0₫</strong>
         </div>
-        <button class="checkout-btn" 
-                onclick="goCheckout()"
-                data-checkout-url="/layout/checkout/checkout.html">
+        <button class="checkout-btn" onclick="goCheckout()">
           Thanh toán
         </button>
         <button class="close-cart-btn">Đóng giỏ hàng</button>
@@ -257,8 +118,9 @@
     </div>
   </div>
 
-  <script src="{{ asset('js/auth.js') }}"></script>
-  <script src="{{ asset('js/header.js') }}"></script>
+  <script defer src="{{ asset('js/auth.js') }}"></script>
+  <script defer src="{{ asset('js/header.js') }}"></script>
+  <script defer src="{{ asset('js/cart.js') }}"></script>
 
 </body>
 </html>
