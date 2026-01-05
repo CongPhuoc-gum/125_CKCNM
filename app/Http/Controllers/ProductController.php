@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -100,8 +101,14 @@ class ProductController extends Controller
         $data['status'] = 1;
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $data['imageUrl'] = $path;
+            try {
+                $path = $request->file('image')->store('products', 'public');
+                $data['imageUrl'] = $path;
+                Log::info('Image uploaded successfully: ' . $path);
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage());
+                return response()->json(['message' => 'Failed to upload image', 'error' => $e->getMessage()], 500);
+            }
         }
 
         $product = Product::create($data);
@@ -124,34 +131,70 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
 
+        // Validation rules - tất cả đều optional cho update
         $validator = Validator::make($request->all(), [
-            'categoryId' => 'exists:categories,categoryId',
-            'name' => 'string|max:150',
-            'price' => 'numeric|min:0',
-            'quantity' => 'integer|min:0',
+            'categoryId' => 'nullable|exists:categories,categoryId',
+            'name' => 'nullable|string|max:150',
+            'price' => 'nullable|numeric|min:0',
+            'quantity' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'integer|in:0,1'
+            'status' => 'nullable|integer|in:0,1'
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->except(['image']);
+        // Lấy data trừ image
+        $data = $request->except(['image', '_method']);
 
+        // Xử lý upload ảnh mới
         if ($request->hasFile('image')) {
+            try {
+                // Xóa ảnh cũ nếu có
+                if ($product->imageUrl) {
+                    $oldImagePath = $product->imageUrl;
+                    
+                    if (Storage::disk('public')->exists($oldImagePath)) {
+                        Storage::disk('public')->delete($oldImagePath);
+                        Log::info('Old image deleted: ' . $oldImagePath);
+                    }
+                }
 
-            if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
-                Storage::disk('public')->delete($product->imageUrl);
+                // Upload ảnh mới
+                $path = $request->file('image')->store('products', 'public');
+                $data['imageUrl'] = $path;
+                Log::info('New image uploaded: ' . $path);
+
+            } catch (\Exception $e) {
+                Log::error('Image update failed: ' . $e->getMessage());
+                return response()->json([
+                    'message' => 'Failed to update image', 
+                    'error' => $e->getMessage()
+                ], 500);
             }
-            $path = $request->file('image')->store('products', 'public');
-            $data['imageUrl'] = $path;
         }
 
-        $product->update($data);
+        // Update product
+        try {
+            $product->update($data);
+            
+            // Reload product with category
+            $product = Product::with('category')->find($id);
+            
+            return response()->json([
+                'message' => 'Product updated successfully',
+                'product' => $product
+            ], 200);
 
-        return response()->json($product);
+        } catch (\Exception $e) {
+            Log::error('Product update failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to update product',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -168,13 +211,24 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
-            Storage::disk('public')->delete($product->imageUrl);
+        try {
+            // Xóa ảnh nếu có
+            if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
+                Storage::disk('public')->delete($product->imageUrl);
+                Log::info('Image deleted: ' . $product->imageUrl);
+            }
+
+            $product->delete();
+
+            return response()->json(['message' => 'Product deleted successfully'], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Product deletion failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to delete product',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $product->delete();
-
-        return response()->json(['message' => 'Product deleted successfully']);
     }
 
     public function bestSelling(Request $request)
