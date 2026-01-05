@@ -55,7 +55,7 @@
   <div class="product-detail">
     <!-- IMAGE -->
     <div class="product-images">
-      <img id="mainImg" src="{{ $product->imageUrl }}" alt="{{ $product->name }}">
+      <img id="mainImg" src="{{ asset('storage/' . $product->imageUrl) }}" alt="{{ $product->name }}">
       <div class="thumbs" id="thumbs"></div>
     </div>
 
@@ -276,7 +276,7 @@
     name: "{{ $product->name }}",
     price: {{ $product->price }},
     description: "{{ $product->description }}",
-    imageUrl: "{{ $product->imageUrl }}",
+    imageUrl: "{{ asset('storage/' . $product->imageUrl) }}",
     quantity: {{ $product->quantity }},
     status: {{ $product->status }},
     categoryId: {{ $product->categoryId ?? 0 }}
