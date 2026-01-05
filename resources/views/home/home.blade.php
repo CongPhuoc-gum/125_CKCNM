@@ -57,7 +57,7 @@
         <div class="carousel-track">
           @forelse($products->take(7) as $product)
           <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="{{ $product->imageUrl }}" alt="{{ $product->name }}">
+            <img src="{{ asset('storage/' . $product->imageUrl) }}" alt="{{ $product->name }}">
             <h3>{{ $product->name }}</h3>
             <div style="color:#666;font-size:14px">{{ Str::limit($product->description, 40) }}</div>
             <div class="price-row">
@@ -76,7 +76,7 @@
       <div class="grid" style="margin-bottom:18px">
         @forelse($products as $product)
         <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="{{ $product->imageUrl }}" alt="{{ $product->name }}">
+          <img src="{{ asset('storage/' . $product->imageUrl) }}" alt="{{ $product->name }}">
           <h3>{{ $product->name }}</h3>
           <div class="price-row">
             <div class="price">{{ number_format($product->price, 2, ',', '.') }}₫</div>

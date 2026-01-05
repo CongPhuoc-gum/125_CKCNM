@@ -187,10 +187,12 @@ document.getElementById('editProductForm').addEventListener('submit', async func
 
     try {
         // ✅ FIX: Đổi từ /api/products/{id} → /api/admin/products/{id}
+        const token = localStorage.getItem('token');
         const response = await fetch(`${API_URL}/admin/products/${productId}`, {
             method: 'POST', // Use POST with _method=PUT for file upload
             headers: {
                 'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: formData
