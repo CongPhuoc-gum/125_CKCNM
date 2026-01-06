@@ -90,7 +90,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'quantity' => 'integer|min:0',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -138,7 +138,7 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'quantity' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'nullable|integer|in:0,1'
         ]);
 
@@ -197,39 +197,55 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $product = Product::find($id);
+/**
+ * Remove the specified resource from storage.
+ *
+ * @param  int  $id
+ * @return \Illuminate\Http\Response
+ */
+public function destroy($id)
+{
+    $product = Product::find($id);
 
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-
-        try {
-            // Xóa ảnh nếu có
-            if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
-                Storage::disk('public')->delete($product->imageUrl);
-                Log::info('Image deleted: ' . $product->imageUrl);
-            }
-
-            $product->delete();
-
-            return response()->json(['message' => 'Product deleted successfully'], 200);
-
-        } catch (\Exception $e) {
-            Log::error('Product deletion failed: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to delete product',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    if (!$product) {
+        return response()->json(['message' => 'Product not found'], 404);
     }
+
+    try {
+        // ✅ Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
+        if ($product->orderitems()->count() > 0) {
+            return response()->json([
+                'message' => 'Không thể xóa sản phẩm này vì đã có trong đơn hàng. Bạn có thể ẩn sản phẩm thay vì xóa.'
+            ], 400);
+        }
+
+        // ✅ Xóa reviews của sản phẩm
+        $product->reviews()->delete();
+        
+        // ✅ Xóa cart items chứa sản phẩm này
+        $product->cartitems()->delete();
+
+        // ✅ Xóa ảnh nếu có
+        if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
+            Storage::disk('public')->delete($product->imageUrl);
+            Log::info('Image deleted: ' . $product->imageUrl);
+        }
+
+        // ✅ Xóa sản phẩm
+        $product->delete();
+
+        return response()->json(['message' => 'Product deleted successfully'], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Product deletion failed: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString()); // ✅ Thêm log chi tiết
+        
+        return response()->json([
+            'message' => 'Có lỗi xảy ra khi xóa sản phẩm',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     public function bestSelling(Request $request)
     {
