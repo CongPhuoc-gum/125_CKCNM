@@ -9,21 +9,24 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check()) {
+        // Check both sanctum (API token) and web (session) auth
+        $user = auth('sanctum')->user() ?? auth()->user();
+
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Vui lòng đăng nhập'
             ], 401);
         }
 
-        if (!auth()->user()->isAdmin()) {
+        if (method_exists($user, 'isAdmin') && !$user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Bạn không có quyền truy cập'
             ], 403);
         }
 
-        if (!auth()->user()->isActive) {
+        if (!$user->isActive) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tài khoản đã bị khóa'
