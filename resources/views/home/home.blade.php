@@ -57,11 +57,14 @@
         <div class="carousel-track">
           @forelse($products->take(7) as $product)
           <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
-            <img src="{{ asset('storage/' . $product->imageUrl) }}" alt="{{ $product->name }}">
+            {{-- ✅ FIX: Thêm /storage/ trước imageUrl --}}
+            <img src="{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}" 
+                 alt="{{ $product->name }}"
+                 onerror="this.src='{{ asset('images/no-image.png') }}'">
             <h3>{{ $product->name }}</h3>
             <div style="color:#666;font-size:14px">{{ Str::limit($product->description, 40) }}</div>
             <div class="price-row">
-              <div class="price">{{ number_format($product->price, 2, ',', '.') }}₫</div>
+              <div class="price">{{ number_format($product->price, 0, ',', '.') }}₫</div>
               <button class="btn-sm" onclick="event.preventDefault(); addToCart({{ $product->productId }});">Thêm vào giỏ</button>
             </div>
           </a>
@@ -76,10 +79,13 @@
       <div class="grid" style="margin-bottom:18px">
         @forelse($products as $product)
         <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
-          <img src="{{ asset('storage/' . $product->imageUrl) }}" alt="{{ $product->name }}">
+          {{-- ✅ FIX: Thêm /storage/ trước imageUrl --}}
+          <img src="{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}" 
+               alt="{{ $product->name }}"
+               onerror="this.src='{{ asset('images/no-image.png') }}'">
           <h3>{{ $product->name }}</h3>
           <div class="price-row">
-            <div class="price">{{ number_format($product->price, 2, ',', '.') }}₫</div>
+            <div class="price">{{ number_format($product->price, 0, ',', '.') }}₫</div>
             <button class="btn-sm" onclick="event.preventDefault(); addToCart({{ $product->productId }});">Thêm vào giỏ</button>
           </div>
         </a>
@@ -110,9 +116,9 @@
         <div class="cart-total">
           Tổng cộng: <strong>0₫</strong>
         </div>
-        <button class="checkout-btn" onclick="goCheckout()">
+        <a href="{{ route('checkout') }}" class="checkout-btn" style="text-decoration: none; display: block; text-align: center;">
           Thanh toán
-        </button>
+        </a>
         <button class="close-cart-btn">Đóng giỏ hàng</button>
       </div>
     </div>

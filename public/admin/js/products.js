@@ -144,33 +144,66 @@ function searchProducts() {
 }
 
 // Delete product
-async function deleteProduct(id) {
+// ✅ HÀM XÓA SẢN PHẨM - ĐẦY ĐỦ
+async function deleteProduct(productId) {
     if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
         return;
     }
     
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        alert('Vui lòng đăng nhập!');
+        window.location.href = '/login';
+        return;
+    }
+    
     try {
-        // ✅ FIX: Đổi từ /api/products/{id} → /api/admin/products/{id}
-        const response = await fetch(`/api/admin/products/${id}`, {
+        const response = await fetch(`/api/admin/products/${productId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'Authorization': `Bearer ${token}`
             }
         });
         
-        const result = await response.json();
+        console.log('Response status:', response.status);
         
-        if (response.ok) {
-            showNotification('Xóa sản phẩm thành công', 'success');
-            loadProducts(currentPage);
-        } else {
-            showNotification('Lỗi: ' + (result.message || 'Không thể xóa sản phẩm'), 'error');
+        if (!response.ok) {
+            const data = await response.json();
+            console.log('Error data:', data);
+            
+            if (response.status === 401) {
+                alert('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return;
+            }
+            
+            if (response.status === 403) {
+                alert('Bạn không có quyền xóa sản phẩm!');
+                return;
+            }
+            
+            if (response.status === 400) {
+                alert(data.message || 'Không thể xóa sản phẩm này!');
+                return;
+            }
+            
+            alert(data.message || 'Xóa sản phẩm thất bại!');
+            return;
         }
+        
+        const data = await response.json();
+        console.log('Success data:', data);
+        
+        alert('Xóa sản phẩm thành công!');
+        loadProducts(); // Reload danh sách
+        
     } catch (error) {
-        console.error('Error deleting product:', error);
-        showNotification('Lỗi kết nối', 'error');
+        console.error('Catch error:', error);
+        alert('Có lỗi xảy ra khi xóa sản phẩm: ' + error.message);
     }
 }
 

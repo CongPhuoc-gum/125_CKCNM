@@ -78,14 +78,27 @@
 @section('scripts')
 <script>
 const API_URL = '/api';
-
-// Get product ID from URL
 const productId = window.location.pathname.split('/')[3];
+
+// Get token from localStorage
+function getAuthToken() {
+    return localStorage.getItem('token');
+}
+
+// Check if user is authenticated
+function checkAuth() {
+    const token = getAuthToken();
+    if (!token) {
+        alert('Vui lòng đăng nhập!');
+        window.location.href = '/login';
+        return false;
+    }
+    return true;
+}
 
 // Load product data
 async function loadProduct() {
     try {
-        // Dùng public route để load data (không cần auth)
         const response = await fetch(`${API_URL}/products/${productId}`, {
             headers: {
                 'Accept': 'application/json'
@@ -98,7 +111,6 @@ async function loadProduct() {
 
         const product = await response.json();
 
-        // Fill form
         document.getElementById('productId').value = product.productId;
         document.getElementById('productName').value = product.name;
         document.getElementById('productPrice').value = product.price;
@@ -139,7 +151,6 @@ async function loadCategories() {
             select.appendChild(option);
         });
 
-        // Load product after categories loaded
         await loadProduct();
         
     } catch (error) {
@@ -166,6 +177,10 @@ document.getElementById('imageInput').addEventListener('change', function(e) {
 document.getElementById('editProductForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    // Check authentication
+    if (!checkAuth()) return;
+    
+    const token = getAuthToken();
     const formData = new FormData();
 
     // Add form fields
@@ -182,49 +197,60 @@ document.getElementById('editProductForm').addEventListener('submit', async func
         formData.append('image', imageFile);
     }
 
-    // Laravel requires _method for PUT with FormData
+    // Laravel _method for PUT
     formData.append('_method', 'PUT');
 
     try {
-        // ✅ FIX: Đổi từ /api/products/{id} → /api/admin/products/{id}
-        const token = localStorage.getItem('token');
+        console.log('Sending request to:', `/api/admin/products/${productId}`);
+        
+        // ✅ FIX: Dùng /api/admin/products với Bearer token
         const response = await fetch(`${API_URL}/admin/products/${productId}`, {
-            method: 'POST', // Use POST with _method=PUT for file upload
+            method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'Authorization': `Bearer ${token}` // ✅ QUAN TRỌNG!
+                // Không cần X-CSRF-TOKEN khi dùng Bearer token
             },
             body: formData
         });
 
+        console.log('Response status:', response.status);
         const data = await response.json();
+        console.log('Response data:', data);
 
         if (response.ok) {
             alert('Cập nhật sản phẩm thành công!');
             window.location.href = '/admin/products';
+        } else if (response.status === 401) {
+            alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        } else if (response.status === 403) {
+            alert('Bạn không có quyền thực hiện thao tác này!');
         } else {
-            // Hiển thị chi tiết lỗi
-            console.error('Error response:', data);
-            
+            // Validation errors
             if (data.errors) {
                 let errorMsg = 'Lỗi validation:\n';
                 for (let field in data.errors) {
-                    errorMsg += `- ${data.errors[field].join(', ')}\n`;
+                    errorMsg += `- ${field}: ${data.errors[field].join(', ')}\n`;
                 }
                 alert(errorMsg);
-            } else if (data.message) {
-                alert('Lỗi: ' + data.message);
             } else {
-                alert('Có lỗi xảy ra khi cập nhật sản phẩm');
+                alert(data.message || 'Có lỗi xảy ra');
             }
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Có lỗi xảy ra khi cập nhật sản phẩm. Vui lòng kiểm tra console để biết thêm chi tiết.');
+        console.error('Fetch Error:', error);
+        alert('Có lỗi xảy ra khi cập nhật sản phẩm: ' + error.message);
     }
 });
 
-window.addEventListener('DOMContentLoaded', loadCategories);
+// Initialize
+window.addEventListener('DOMContentLoaded', function() {
+    if (checkAuth()) {
+        loadCategories();
+    }
+});
 </script>
 @endsection

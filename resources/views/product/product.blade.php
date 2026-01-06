@@ -53,9 +53,12 @@
   </div>
 
   <div class="product-detail">
-    <!-- IMAGE -->
+    <!-- IMAGE - ✅ FIX: Thêm storage/ vào đường dẫn -->
     <div class="product-images">
-      <img id="mainImg" src="{{ asset('storage/' . $product->imageUrl) }}" alt="{{ $product->name }}">
+      <img id="mainImg" 
+           src="{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}" 
+           alt="{{ $product->name }}"
+           onerror="this.src='{{ asset('images/no-image.png') }}'">
       <div class="thumbs" id="thumbs"></div>
     </div>
 
@@ -81,7 +84,7 @@
 
       <div class="price-box">
         <span class="old-price" id="oldPrice"></span>
-        <span class="price" id="price">{{ number_format($product->price, 2, ',', '.') }}₫</span>
+        <span class="price" id="price">{{ number_format($product->price, 0, ',', '.') }}₫</span>
         <span class="unit" id="unit"></span>
       </div>
 
@@ -136,6 +139,7 @@
   © <strong>SnackFood</strong> — Chuyên đồ khô chất lượng. Liên hệ: 0900 123 456 · email: info@snackfood.vn
 </footer>
 
+<!-- ===== CART OVERLAY - ✅ Cart sẽ được render bởi cart.js ===== -->
 <div id="cart-overlay">
   <div class="cart-panel">
     <div class="cart-header">
@@ -144,26 +148,16 @@
     </div>
 
     <div class="cart-items">
-      <div class="cart-item">
-        <img src="https://langfarm-backend.s3.amazonaws.com/10.YSE_Mau%20hut%20chan%20khong%20(Thit%20kho%20an%20lien).jpg">
-        <div class="cart-info">
-          <div class="cart-name">Thịt kho ăn liền</div>
-          <div class="cart-price">120.000₫</div>
-          <div class="cart-qty">
-            <button>-</button>
-            <span>1</span>
-            <button>+</button>
-          </div>
-        </div>
-        <button class="remove-item">✕</button>
-      </div>
+      <!-- updateCartUI() sẽ render dữ liệu giỏ hàng vào đây -->
     </div>
 
     <div class="cart-footer">
       <div class="cart-total">
-        Tổng cộng: <strong>120.000₫</strong>
+        Tổng cộng: <strong>0₫</strong>
       </div>
-      <button class="checkout-btn" onclick="goCheckout()">Thanh toán</button>
+      <a href="{{ route('checkout') }}" class="checkout-btn" style="text-decoration: none; display: block; text-align: center;">
+        Thanh toán
+      </a>
       <button class="close-cart-btn">Đóng giỏ hàng</button>
     </div>
   </div>    
@@ -252,8 +246,9 @@
       window.location.href = '{{ route("login") }}';
       return;
     }
-    // Code thêm vào giỏ hàng ở đây
-    alert('Đã thêm vào giỏ hàng!');
+    // Gọi hàm addToCart từ cart.js
+    const qty = parseInt(document.getElementById('qty').value) || 1;
+    addToCart({{ $product->productId }}, qty);
   }
 
   // Hàm xử lý mua ngay
@@ -264,19 +259,31 @@
       window.location.href = '{{ route("login") }}';
       return;
     }
-    // Code mua ngay ở đây
-    alert('Chuyển đến trang thanh toán...');
+    // Thêm vào giỏ rồi chuyển đến checkout
+    const qty = parseInt(document.getElementById('qty').value) || 1;
+    addToCart({{ $product->productId }}, qty);
+    window.location.href = '{{ route("checkout") }}';
+  }
+
+  // Hàm thay đổi số lượng
+  function changeQty(delta) {
+    const qtyInput = document.getElementById('qty');
+    let currentQty = parseInt(qtyInput.value) || 1;
+    currentQty += delta;
+    if (currentQty < 1) currentQty = 1;
+    if (currentQty > {{ $product->quantity }}) currentQty = {{ $product->quantity }};
+    qtyInput.value = currentQty;
   }
 </script>
 
-<!-- QUAN TRỌNG: Truyền product data từ Laravel sang JavaScript -->
+<!-- ✅ QUAN TRỌNG: Truyền product data từ Laravel sang JavaScript với đường dẫn ảnh đầy đủ -->
 <script>
   window.productData = {
     id: {{ $product->productId }},
-    name: "{{ $product->name }}",
+    name: "{{ addslashes($product->name) }}",
     price: {{ $product->price }},
-    description: "{{ $product->description }}",
-    imageUrl: "{{ asset('storage/' . $product->imageUrl) }}",
+    description: "{{ addslashes($product->description) }}",
+    imageUrl: "{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}",
     quantity: {{ $product->quantity }},
     status: {{ $product->status }},
     categoryId: {{ $product->categoryId ?? 0 }}
