@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Đơn hàng của tôi | SnackFood</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- CSS dùng chung với HOME -->
+  <link rel="stylesheet" href="../home/styles.css">
+  <!-- CSS riêng cho checkout -->
+  <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+
+<div class="site">
+
+<!-- ===== HEADER (COPY TỪ HOME) ===== -->
+<header>
+  <a class="brand" href="../home/home.html">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoV0_K78ROk_yDSrCyKON-JkXA5uWF9gxe4A&s" alt="SnackFood">
+    <div>
+      <h1>SnackFood</h1>
+      <div>Shop chuyên bán đồ khô</div>
+    </div>
+  </a>
+
+  <div class="menu-wrapper">
+    <button id="menu-toggle">
+      Danh Mục <span class="arrow">▼</span>
+    </button>
+    <div id="dropdown-menu" class="dropdown-menu">
+      <a href="../home/home.html#products" class="menu-item">🔥 Bán Chạy</a>
+      <a href="../home/home.html#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+      <a href="#" class="menu-item">🦑 Mực Khô</a>
+      <a href="#" class="menu-item">🐟 Cá Khô</a>
+      <a href="#" class="menu-item">🥜 Hạt & Snack</a>
+      <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
+      <a href="../home/home.html#contact" class="menu-item">📞 Liên Hệ</a>
+    </div>
+  </div>
+
+  <div class="search" role="search">
+    <input type="search" placeholder="Tìm kiếm sản phẩm...">
+    <button>🔎</button>
+  </div>
+
+  <button id="cart-btn">
+    🛒 <span id="cart-count">0</span>
+  </button>
+
+  <div id="user-area"></div>
+</header>
+
+<div id="dropdown-overlay"></div>
+
+<!-- ===== CONTENT ===== -->
+<main class="orders-page">
+
+  <h2>📦 Đơn hàng của tôi</h2>
+
+  <div id="orders-list" class="orders-list"></div>
+
+  <div id="empty-orders" class="empty-orders">
+    Bạn chưa có đơn hàng nào 😢  
+    <br><br>
+    <a href="../home/home.html" class="back-home">Mua sắm ngay</a>
+  </div>
+
+</main>
+
+</div>
+
+<!-- ===== SCRIPT ===== -->
+<script>
+/* ===== USER CHECK ===== */
+(function(){
+  const userArea = document.getElementById("user-area");
+  const user = localStorage.getItem("snack_username");
+
+  if(!user){
+    window.location.href = "../login/login.html";
+    return;
+  }
+
+  userArea.innerHTML =
+    'Xin chào, ' + user +
+    ' <button id="logoutBtn">Đăng xuất</button>';
+
+  document.getElementById("logoutBtn").onclick = function(){
+    localStorage.removeItem("snack_username");
+    window.location.href = "../login/login.html";
+  };
+})();
+
+/* ===== LOAD ORDERS ===== */
+const orders = JSON.parse(localStorage.getItem("snack_orders")) || [];
+const list = document.getElementById("orders-list");
+const empty = document.getElementById("empty-orders");
+
+if(orders.length === 0){
+  empty.style.display = "block";
+} else {
+  empty.style.display = "none";
+  orders.reverse().forEach(renderOrder);
+}
+
+function renderOrder(order){
+  const div = document.createElement("div");
+  div.className = "order-card";
+
+  div.innerHTML = `
+    <div class="order-header">
+      <strong>Mã đơn: #${order.id}</strong>
+      <span class="status ${order.status}">
+        ${statusText(order.status)}
+      </span>
+    </div>
+
+    <div class="order-body">
+      <p>📅 Ngày đặt: ${order.date}</p>
+      <p>💰 Tổng tiền: <strong>${order.total}</strong></p>
+
+      <ul class="order-items">
+        ${order.items.map(i =>
+          `<li>${i.name} × ${i.qty}</li>`
+        ).join("")}
+      </ul>
+    </div>
+  `;
+  list.appendChild(div);
+}
+
+function statusText(s){
+  if(s==="processing") return "⏳ Đang xử lý";
+  if(s==="shipping") return "🚚 Đang giao";
+  return "✅ Hoàn thành";
+}
+</script>
+
+</body>
+</html>
