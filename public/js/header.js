@@ -248,26 +248,290 @@ function initUserDropdown() {
   });
 }
 
-// ===== SEARCH FUNCTION =====
+// ===== SEARCH FUNCTIONALITY - TÌM KIẾM THÔNG MINH =====
+let allProducts = [];
+let searchTimeout = null;
+
 function initSearch() {
   const searchInput = document.querySelector('.search input[type="search"]');
   const searchBtn = document.querySelector('.search button');
 
   if (!searchInput || !searchBtn) return;
 
-  searchBtn.addEventListener('click', function () {
+  console.log('✅ Search initialized');
+
+  // Tạo dropdown suggestions
+  createSearchDropdown();
+
+  // Lấy tất cả sản phẩm từ DOM
+  getAllProductsFromDOM();
+
+  // Search khi gõ (với debounce)
+  searchInput.addEventListener('input', function () {
+    clearTimeout(searchTimeout);
+    const query = this.value.trim();
+
+    if (query.length < 2) {
+      hideSearchDropdown();
+      return;
+    }
+
+    searchTimeout = setTimeout(() => {
+      handleSearch(query);
+    }, 300);
+  });
+
+  // Search khi click button
+  searchBtn.addEventListener('click', function (e) {
+    e.preventDefault();
     const query = searchInput.value.trim();
     if (query) {
-      console.log('Tìm kiếm:', query);
-      // TODO: Implement search functionality
+      performSearch(query);
     }
   });
 
+  // Search khi nhấn Enter
   searchInput.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
-      searchBtn.click();
+      e.preventDefault();
+      const query = this.value.trim();
+      if (query) {
+        performSearch(query);
+      }
     }
   });
+
+  // Focus vào search input
+  searchInput.addEventListener('focus', function () {
+    const query = this.value.trim();
+    if (query && query.length >= 2) {
+      handleSearch(query);
+    }
+  });
+
+  // Đóng dropdown khi click bên ngoài
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.search')) {
+      hideSearchDropdown();
+    }
+  });
+}
+
+// ===== TẠO DROPDOWN SUGGESTIONS =====
+function createSearchDropdown() {
+  const searchContainer = document.querySelector('.search');
+  if (!searchContainer) return;
+
+  // Xóa dropdown cũ nếu có
+  const oldDropdown = document.getElementById('searchDropdown');
+  if (oldDropdown) {
+    oldDropdown.remove();
+  }
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'search-dropdown';
+  dropdown.id = 'searchDropdown';
+  searchContainer.appendChild(dropdown);
+}
+
+// ===== LẤY TẤT CẢ SẢN PHẨM TỪ DOM =====
+function getAllProductsFromDOM() {
+  const productCards = document.querySelectorAll('.card');
+  allProducts = [];
+
+  productCards.forEach(card => {
+    const link = card.querySelector('a');
+    const name = card.querySelector('h3')?.textContent?.trim() || '';
+    const priceText = card.querySelector('.price')?.textContent || '0';
+    const price = parseInt(priceText.replace(/[^\d]/g, ''));
+    const img = card.querySelector('img')?.getAttribute('src') || '';
+    const href = link?.getAttribute('href') || '#';
+
+    if (name && href !== '#') {
+      allProducts.push({
+        productId: href.split('/').pop(),
+        name: name,
+        price: price,
+        imageUrl: img,
+        link: href
+      });
+    }
+  });
+
+  console.log(`✅ Loaded ${allProducts.length} products for search`);
+}
+
+// ===== HANDLE SEARCH (REAL-TIME) =====
+function handleSearch(query) {
+  const results = searchProducts(query);
+  displaySearchSuggestions(results, query);
+}
+
+// ===== TÌM KIẾM SẢN PHẨM THÔNG MINH =====
+function searchProducts(query) {
+  const queryLower = query.toLowerCase().trim();
+  const queryWords = queryLower.split(' ').filter(w => w.length > 0);
+
+  // Tìm kiếm và tính điểm cho mỗi sản phẩm
+  const results = allProducts.map(product => {
+    const nameLower = product.name.toLowerCase();
+    let score = 0;
+
+    // Điểm cao nhất: Tên chính xác
+    if (nameLower === queryLower) {
+      score = 100;
+    }
+    // Điểm cao: Bắt đầu bằng query
+    else if (nameLower.startsWith(queryLower)) {
+      score = 90;
+    }
+    // Điểm trung bình: Chứa toàn bộ query
+    else if (nameLower.includes(queryLower)) {
+      score = 70;
+    }
+    // Điểm thấp: Chứa các từ trong query (ví dụ: "khô" → tìm "khô bò", "khô gà")
+    else {
+      let matchCount = 0;
+      queryWords.forEach(word => {
+        if (nameLower.includes(word)) {
+          matchCount++;
+        }
+      });
+
+      if (matchCount > 0) {
+        score = 50 + (matchCount * 10);
+      }
+    }
+
+    return { product, score };
+  })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5) // Giới hạn 5 kết quả - compact version
+    .map(item => item.product);
+
+  return results;
+}
+
+// ===== HIỂN THỊ SUGGESTIONS =====
+function displaySearchSuggestions(results, query) {
+  const dropdown = document.getElementById('searchDropdown');
+  if (!dropdown) return;
+
+  if (results.length === 0) {
+    dropdown.innerHTML = `
+      <div class="search-no-results">
+        <span>❌ Không tìm thấy sản phẩm nào cho "${query}"</span>
+      </div>
+    `;
+    dropdown.classList.add('show');
+    return;
+  }
+
+  let html = '<div class="search-results">';
+
+  results.forEach(product => {
+    const highlightedName = highlightText(product.name, query);
+
+    html += `
+      <a href="${product.link}" class="search-result-item">
+        <div class="search-result-image">
+          ${product.imageUrl ?
+        `<img src="${product.imageUrl}" alt="${product.name}" onerror="this.parentElement.innerHTML='<div class=\\'search-no-img\\'>${product.name.charAt(0)}</div>'">` :
+        `<div class="search-no-img">${product.name.charAt(0)}</div>`
+      }
+        </div>
+        <div class="search-result-info">
+          <div class="search-result-name">${highlightedName}</div>
+          <div class="search-result-price">${formatPrice(product.price)}₫</div>
+        </div>
+      </a>
+    `;
+  });
+
+  html += '</div>';
+  dropdown.innerHTML = html;
+  dropdown.classList.add('show');
+}
+
+// ===== HIGHLIGHT TEXT =====
+function highlightText(text, query) {
+  const queryLower = query.toLowerCase();
+  const textLower = text.toLowerCase();
+  const index = textLower.indexOf(queryLower);
+
+  if (index === -1) return text;
+
+  const before = text.substring(0, index);
+  const match = text.substring(index, index + query.length);
+  const after = text.substring(index + query.length);
+
+  return `${before}<strong class="search-highlight">${match}</strong>${after}`;
+}
+
+// ===== FORMAT PRICE =====
+function formatPrice(price) {
+  return price.toLocaleString('vi-VN');
+}
+
+// ===== PERFORM SEARCH (SCROLL TO RESULTS) =====
+function performSearch(query) {
+  hideSearchDropdown();
+
+  const results = searchProducts(query);
+
+  if (results.length === 0) {
+    alert(`❌ Không tìm thấy sản phẩm nào cho "${query}"`);
+    return;
+  }
+
+  // Scroll to products section
+  const productsSection = document.getElementById('best') || document.getElementById('products');
+  if (productsSection) {
+    productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Filter và hiển thị kết quả
+  filterProductCards(results);
+}
+
+// ===== FILTER PRODUCT CARDS =====
+function filterProductCards(results) {
+  const resultIds = new Set(results.map(p => p.productId));
+  const allCards = document.querySelectorAll('.card');
+
+  allCards.forEach(card => {
+    const link = card.querySelector('a')?.getAttribute('href') || '';
+    const productId = link.split('/').pop();
+
+    if (resultIds.has(productId)) {
+      card.style.display = 'block';
+      card.style.animation = 'fadeIn 0.3s ease';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // Thêm CSS animation nếu chưa có
+  if (!document.getElementById('searchAnimationStyle')) {
+    const style = document.createElement('style');
+    style.id = 'searchAnimationStyle';
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// ===== HIDE SEARCH DROPDOWN =====
+function hideSearchDropdown() {
+  const dropdown = document.getElementById('searchDropdown');
+  if (dropdown) {
+    dropdown.classList.remove('show');
+  }
 }
 
 // ===== INITIALIZE ALL =====
