@@ -56,7 +56,7 @@ function initCartOverlay() {
   });
 }
 
-// ===== CAROUSEL =====
+// ===== CAROUSEL WITH INFINITE LOOP =====
 function initCarousel() {
   const track = document.querySelector('.carousel-track');
   const prevBtn = document.querySelector('.carousel-btn.prev');
@@ -67,59 +67,143 @@ function initCarousel() {
   const cards = track.querySelectorAll('.card');
   if (cards.length === 0) return;
 
-  const cardWidth = cards[0].offsetWidth + 16;
-  let currentPosition = 0;
+  let currentIndex = 0;
+  const totalCards = cards.length;
+  const cardWidth = cards[0].offsetWidth + 18;
+
+  function scrollToIndex(index) {
+    if (index < 0) {
+      currentIndex = totalCards - 1;
+    } else if (index >= totalCards) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+
+    const scrollPosition = currentIndex * cardWidth;
+    track.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
+  }
 
   nextBtn.addEventListener('click', function () {
-    const maxScroll = track.scrollWidth - track.offsetWidth;
-    currentPosition = Math.min(currentPosition + cardWidth, maxScroll);
-    track.style.transform = `translateX(-${currentPosition}px)`;
+    scrollToIndex(currentIndex + 1);
   });
 
   prevBtn.addEventListener('click', function () {
-    currentPosition = Math.max(currentPosition - cardWidth, 0);
-    track.style.transform = `translateX(-${currentPosition}px)`;
+    scrollToIndex(currentIndex - 1);
+  });
+
+  let autoScrollInterval = setInterval(function () {
+    scrollToIndex(currentIndex + 1);
+  }, 4000);
+
+  track.addEventListener('mouseenter', function () {
+    clearInterval(autoScrollInterval);
+  });
+
+  track.addEventListener('mouseleave', function () {
+    autoScrollInterval = setInterval(function () {
+      scrollToIndex(currentIndex + 1);
+    }, 4000);
   });
 }
 
-// ===== USER AUTHENTICATION - DÙNG VỚI AUTH.JS CŨA BẠN =====
+// ===== USER AUTHENTICATION WITH DROPDOWN =====
 function initUserAuth() {
   const userArea = document.getElementById('user-area');
   if (!userArea) return;
 
-  // Lấy thông tin từ localStorage (auth.js của bạn lưu vào 'user' và 'token')
   const token = localStorage.getItem('token');
   const userDataStr = localStorage.getItem('user');
-  
+
   const loginUrl = userArea.dataset.loginUrl || '/login';
   const registerUrl = userArea.dataset.registerUrl || '/register';
 
   if (!token || !userDataStr) {
-    // Chưa đăng nhập - Hiển thị nút đăng nhập/đăng ký
+    // Chưa đăng nhập
     userArea.innerHTML =
-      '<a href="' + loginUrl + '" style="background:linear-gradient(90deg,#4CAF50,#45a049);color:#fff;border:none;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700;margin-right:8px">Đăng nhập</a>' +
-      '<a href="' + registerUrl + '" style="background:linear-gradient(90deg,#2196F3,#1976D2);color:#fff;border:none;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700">Đăng ký</a>';
+      '<a href="' + loginUrl + '" class="user-login-btn">Đăng nhập</a>' +
+      '<a href="' + registerUrl + '" class="user-register-btn">Đăng ký</a>';
   } else {
-    // Đã đăng nhập - Hiển thị tên và nút đăng xuất
+    // Đã đăng nhập
     try {
       const user = JSON.parse(userDataStr);
       const userName = user.fullName || user.email || 'User';
-      
-      userArea.innerHTML =
-        '<span style="color:#2b2b2b;font-weight:700;margin-right:8px">Xin chào, ' + encodeHTML(userName) + '</span>' +
-        '<button id="logoutBtn" style="background:linear-gradient(90deg,#ff4b2b,#e63e20);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700">Đăng xuất</button>';
+      const userAvatar = user.avatar || null;
 
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn && typeof window.handleLogout === 'function') {
+      userArea.innerHTML = `
+        <div class="user-dropdown-wrapper">
+          <button class="user-profile-btn" id="userProfileBtn">
+            ${userAvatar ?
+          `<img src="${userAvatar}" alt="${userName}" class="user-avatar">` :
+          `<div class="user-avatar-placeholder">${userName.charAt(0).toUpperCase()}</div>`
+        }
+            <span class="user-name">${encodeHTML(userName)}</span>
+            <span class="user-arrow">▼</span>
+          </button>
+
+          <div class="user-dropdown-menu" id="userDropdownMenu">
+            <div class="user-dropdown-header">
+              <div class="user-info">
+                ${userAvatar ?
+          `<img src="${userAvatar}" alt="${userName}" class="user-avatar-large">` :
+          `<div class="user-avatar-placeholder large">${userName.charAt(0).toUpperCase()}</div>`
+        }
+                <div class="user-details">
+                  <div class="user-fullname">${encodeHTML(userName)}</div>
+                  <div class="user-email">${encodeHTML(user.email || '')}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="user-dropdown-body">
+              <a href="/orders" class="dropdown-item">
+                <span class="dropdown-icon">📦</span>
+                <span>Đơn hàng của tôi</span>
+              </a>
+              
+              <a href="/profile" class="dropdown-item">
+                <span class="dropdown-icon">👤</span>
+                <span>Thông tin tài khoản</span>
+              </a>
+
+              <a href="/contact" class="dropdown-item">
+                <span class="dropdown-icon">📞</span>
+                <span>Liên hệ & hỗ trợ</span>
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <button class="dropdown-item logout-item" id="logoutBtnDropdown">
+                <span class="dropdown-icon">🚪</span>
+                <span>Đăng xuất</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      initUserDropdown();
+
+      const logoutBtn = document.getElementById('logoutBtnDropdown');
+      if (logoutBtn) {
         logoutBtn.addEventListener('click', function () {
           if (confirm('Bạn có chắc muốn đăng xuất?')) {
-            window.handleLogout();
+            if (typeof window.handleLogout === 'function') {
+              window.handleLogout();
+            } else {
+              localStorage.removeItem('token');
+              localStorage.removeItem('token_type');
+              localStorage.removeItem('user');
+              window.location.href = loginUrl;
+            }
           }
         });
       }
     } catch (error) {
       console.error('Parse user data error:', error);
-      // Nếu lỗi, xóa data và hiển thị nút đăng nhập
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.reload();
@@ -135,22 +219,33 @@ function initUserAuth() {
   }
 }
 
-// ===== CHECKOUT FUNCTION =====
-function goCheckout() {
-  const checkoutBtn = document.querySelector('.checkout-btn');
-  const loginUrl = checkoutBtn ? checkoutBtn.dataset.loginUrl : '/login';
-  const checkoutUrl = checkoutBtn ? checkoutBtn.dataset.checkoutUrl : '/checkout';
+// User dropdown toggle
+function initUserDropdown() {
+  const profileBtn = document.getElementById('userProfileBtn');
+  const dropdownMenu = document.getElementById('userDropdownMenu');
 
-  // Kiểm tra đăng nhập
-  const token = localStorage.getItem('token');
-  
-  if (!token) {
-    alert('Vui lòng đăng nhập để thanh toán!');
-    window.location.href = loginUrl;
-    return;
-  }
-  
-  window.location.href = checkoutUrl;
+  if (!profileBtn || !dropdownMenu) return;
+
+  profileBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle('show');
+    profileBtn.classList.toggle('active');
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.user-dropdown-wrapper')) {
+      dropdownMenu.classList.remove('show');
+      profileBtn.classList.remove('active');
+    }
+  });
+
+  const menuItems = dropdownMenu.querySelectorAll('.dropdown-item:not(.logout-item)');
+  menuItems.forEach(item => {
+    item.addEventListener('click', function () {
+      dropdownMenu.classList.remove('show');
+      profileBtn.classList.remove('active');
+    });
+  });
 }
 
 // ===== SEARCH FUNCTION =====
@@ -165,7 +260,6 @@ function initSearch() {
     if (query) {
       console.log('Tìm kiếm:', query);
       // TODO: Implement search functionality
-      // window.location.href = '/search?q=' + encodeURIComponent(query);
     }
   });
 
@@ -176,22 +270,13 @@ function initSearch() {
   });
 }
 
-// ===== CART COUNT UPDATE =====
-function updateCartCount() {
-  const cartCount = document.getElementById('cart-count');
-  if (!cartCount) return;
-
-  // Lấy số lượng sản phẩm trong giỏ hàng từ localStorage
-  const items = JSON.parse(localStorage.getItem('cart_items') || '[]');
-  cartCount.textContent = items.length;
-}
-
 // ===== INITIALIZE ALL =====
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('✅ Header.js loaded');
+
   initMenuDropdown();
   initCartOverlay();
   initCarousel();
   initUserAuth();
   initSearch();
-  updateCartCount();
 });

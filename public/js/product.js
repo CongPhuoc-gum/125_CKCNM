@@ -1,62 +1,3 @@
-const products = [
-  {
-    id: 1,
-    name: "Mực Một Nắng",
-    price: 199000,
-    oldPrice: 249000,
-    unit: "/ kg",
-    rating: 4.8,
-    reviews: 128,
-    desc: "Mực một nắng phơi tự nhiên, mềm dai, vị ngọt thanh từ biển.",
-    brand: "SnackFood",
-    status: "Còn hàng",
-    shipping: "Toàn quốc",
-    time: "2–3 ngày",
-    images: [
-      "https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg",
-      "https://phucfood.vn/wp-content/uploads/2023/08/Muc-mot-nang-24.jpg",
-      "https://phucfood.vn/wp-content/uploads/2023/08/Muc-mot-nang-24.jpg"
-    ]
-  },
-  {
-    id: 2,
-    name: "Cá cơm sấy",
-    price: 89000,
-    oldPrice: null,
-    unit: "/ gói",
-    rating: 4.6,
-    reviews: 84,
-    desc: "Cá cơm sấy giòn, phù hợp ăn vặt và nhâm nhi.",
-    brand: "SnackFood",
-    status: "Còn hàng",
-    shipping: "Toàn quốc",
-    time: "2–3 ngày",
-    images: [
-      "https://images.unsplash.com/photo-1542736667-069246bdbc81"
-    ]
-  },
-  {
-    id: 3,
-    name: "Mực Một Nắng 3",
-    price: 199000,
-    oldPrice: 249000,
-    unit: "/ kg",
-    rating: 4.8,
-    reviews: 128,
-    desc: "Mực một nắng phơi tự nhiên, mềm dai, vị ngọt thanh từ biển.",
-    brand: "SnackFood",
-    status: "Còn hàng",
-    shipping: "Toàn quốc",
-    time: "2–3 ngày",
-    images: [
-      "https://png.pngtree.com/thumb_back/fh260/background/20210907/pngtree-snacks-snack-food-delicious-dried-squid-shreds-photography-map-with-pictures-image_816479.jpg",
-      "https://images.unsplash.com/photo-1542736667-069246bdbc81",
-      "https://images.unsplash.com/photo-1606312619347-3b4f2f7f9d4e"
-    ]
-  },
-  // Thêm các sản phẩm khác...
-];
-
 /* LẤY ID TỪ LARAVEL (đã được set trong blade template) */
 const id = window.productId || 1;
 
@@ -111,7 +52,7 @@ product.images.forEach((src, i) => {
 });
 
 /* QTY */
-function changeQty(n){
+function changeQty(n) {
   const q = document.getElementById("qty");
   q.value = Math.max(1, parseInt(q.value) + n);
 }

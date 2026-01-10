@@ -42,6 +42,11 @@ Route::get('/checkout', function () {
     return view('checkout.checkout');
 })->name('checkout');
 
+Route::get('orders', function () {
+    return view('order.orders');
+})->name('orders');
+
+
 //admin routes
 Route::prefix('admin')->middleware(['web'])->group(function () {
     
