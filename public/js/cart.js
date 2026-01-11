@@ -1,5 +1,8 @@
 // ===== CART.JS - Quản lý Giỏ Hàng =====
-const API_URL = 'http://localhost:8000/api';
+if (!window.API_URL) {
+    window.API_URL = 'http://localhost:8000/api';
+}
+const API_URL = window.API_URL;
 
 // ===== EXPORT GLOBAL FUNCTIONS NGAY LẬP TỨC =====
 window.addToCart = addToCart;

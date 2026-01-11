@@ -102,54 +102,8 @@
         </label>
       </div>
     </section>
-    <div class="left-column">
-      <!-- THÔNG TIN GIAO HÀNG -->
-      <section class="checkout-box">
-        <h3>📦 Thông tin giao hàng</h3>
-        <input type="text" id="fullname" placeholder="Họ và tên *" required>
-        <input type="tel" id="phone" placeholder="Số điện thoại *" required>
-        <input type="text" id="address" placeholder="Địa chỉ giao hàng *" required>
-        <textarea id="note" placeholder="Ghi chú cho người bán (nếu có)"></textarea>
-      </section>
-
-      <!-- PHƯƠNG THỨC THANH TOÁN -->
-      <section class="checkout-box">
-        <h3>💳 Phương thức thanh toán</h3>
-
-        <label class="pay-option">
-          <input type="radio" name="pay" value="cod" checked>
-          <span class="pay-content">
-            <span class="pay-icon">💵</span>
-            <span class="pay-text">
-              <strong>Thanh toán khi nhận hàng (COD)</strong>
-              <small>Thanh toán bằng tiền mặt khi nhận hàng</small>
-            </span>
-          </span>
-        </label>
-
-        <label class="pay-option">
-          <input type="radio" name="pay" value="bank">
-          <span class="pay-content">
-            <span class="pay-icon">🏦</span>
-            <span class="pay-text">
-              <strong>Chuyển khoản ngân hàng</strong>
-              <small>Chuyển khoản trước, giao hàng sau</small>
-            </span>
-          </span>
-        </label>
-
-        <label class="pay-option">
-          <input type="radio" name="pay" value="ewallet">
-          <span class="pay-content">
-            <span class="pay-icon">📱</span>
-            <span class="pay-text">
-              <strong>Ví điện tử</strong>
-              <small>Momo, ZaloPay, VNPay</small>
-            </span>
-          </span>
-        </label>
-      </section>
-    </div>
+    
+      
 
     <!-- TÓM TẮT ĐƠN HÀNG -->
     <section class="checkout-box summary">
