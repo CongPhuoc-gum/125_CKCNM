@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\UserController; 
 
 // ========== PUBLIC ROUTES ==========
 Route::prefix('auth')->group(function () {
@@ -16,7 +17,6 @@ Route::prefix('auth')->group(function () {
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
     Route::post('/login', [AuthController::class, 'login']);
-
     Route::get('/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
@@ -60,6 +60,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Reviews
     Route::post('/reviews', [ReviewController::class, 'store']);
+
+    Route::prefix('user')->group(function () {
+        Route::get('/profile', [UserController::class, 'getProfile']);
+        Route::put('/profile', [UserController::class, 'updateProfile']);
+        Route::put('/change-password', [UserController::class, 'changePassword']);
+    });
 });
 
 // Payment callbacks
