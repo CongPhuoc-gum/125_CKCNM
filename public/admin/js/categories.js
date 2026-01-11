@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = window.location.origin + '/api';
 let isEditMode = false;
 
 async function loadCategories() {
@@ -16,14 +16,14 @@ async function loadCategories() {
 
     } catch (error) {
         console.error('Error loading categories:', error);
-        document.getElementById('categoriesTable').innerHTML = 
+        document.getElementById('categoriesTable').innerHTML =
             '<tr><td colspan="7" class="text-center">Lỗi tải dữ liệu</td></tr>';
     }
 }
 
 function displayCategories(categories) {
     const tbody = document.getElementById('categoriesTable');
-    
+
     if (!categories || categories.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chưa có danh mục nào</td></tr>';
         return;
@@ -78,9 +78,9 @@ async function editCategory(id) {
         document.getElementById('categoryId').value = category.categoryId;
         document.getElementById('categoryName').value = category.name;
         document.getElementById('categoryStatus').value = category.status ? '1' : '0';
-        
+
         if (category.imageUrl) {
-            document.getElementById('categoryImagePreview').innerHTML = 
+            document.getElementById('categoryImagePreview').innerHTML =
                 `<img src="/storage/${category.imageUrl}" class="image-preview" alt="${category.name}">`;
         }
 
@@ -97,12 +97,12 @@ function closeModal() {
 }
 
 // Image preview
-document.getElementById('categoryImage').addEventListener('change', function(e) {
+document.getElementById('categoryImage').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('categoryImagePreview').innerHTML = 
+        reader.onload = function (e) {
+            document.getElementById('categoryImagePreview').innerHTML =
                 `<img src="${e.target.result}" class="image-preview" alt="Preview">`;
         };
         reader.readAsDataURL(file);
@@ -110,15 +110,15 @@ document.getElementById('categoryImage').addEventListener('change', function(e) 
 });
 
 // Submit form
-document.getElementById('categoryForm').addEventListener('submit', async function(e) {
+document.getElementById('categoryForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    
+
     const categoryId = document.getElementById('categoryId').value;
     const formData = new FormData();
-    
+
     formData.append('name', document.getElementById('categoryName').value);
     formData.append('status', document.getElementById('categoryStatus').value);
-    
+
     const imageFile = document.getElementById('categoryImage').files[0];
     if (imageFile) {
         formData.append('image', imageFile);
@@ -130,7 +130,7 @@ document.getElementById('categoryForm').addEventListener('submit', async functio
 
     try {
         let response;
-        
+
         if (isEditMode) {
             // For PUT, need to send as JSON if no file
             if (!imageFile) {
@@ -217,7 +217,7 @@ function formatDate(dateString) {
 }
 
 // Close modal on background click
-document.getElementById('categoryModal').addEventListener('click', function(e) {
+document.getElementById('categoryModal').addEventListener('click', function (e) {
     if (e.target === this) {
         closeModal();
     }

@@ -93,8 +93,17 @@ class OrderController extends Controller
                     'amount' => $order->totalAmount,
                     'status' => 'pending',
                 ]);
+
+                // Clear user's cart after successful order
+                if ($request->userId) {
+                    $cart = DB::table('carts')->where('userId', $request->userId)->first();
+                    if ($cart) {
+                        DB::table('cartitems')->where('cartId', $cart->cartId)->delete();
+                    }
+                }
+
                 DB::commit();
-                return response()->json(['message' => 'Order created successfully', 'orderId' => $order->orderId], 201);
+                return response()->json(['success' => true, 'message' => 'Order created successfully', 'orderId' => $order->orderId], 201);
             } elseif ($request->paymentMethod === 'vnpay') {
                 Payment::create([
                     'orderId' => $order->orderId,
@@ -102,11 +111,20 @@ class OrderController extends Controller
                     'amount' => $order->totalAmount,
                     'status' => 'pending',
                 ]);
+
+                // Clear user's cart after successful order
+                if ($request->userId) {
+                    $cart = DB::table('carts')->where('userId', $request->userId)->first();
+                    if ($cart) {
+                        DB::table('cartitems')->where('cartId', $cart->cartId)->delete();
+                    }
+                }
+
                 DB::commit();
 
                 
                 $vnpUrl = $this->createVnpayUrl($order);
-                return response()->json(['message' => 'Redirect to VNPAY', 'url' => $vnpUrl], 200);
+                return response()->json(['success' => true, 'message' => 'Redirect to VNPAY', 'redirectUrl' => $vnpUrl], 200);
             } elseif ($request->paymentMethod === 'stripe') {
                 Payment::create([
                     'orderId' => $order->orderId,
@@ -114,6 +132,15 @@ class OrderController extends Controller
                     'amount' => $order->totalAmount,
                     'status' => 'pending',
                 ]);
+
+                // Clear user's cart after successful order
+                if ($request->userId) {
+                    $cart = DB::table('carts')->where('userId', $request->userId)->first();
+                    if ($cart) {
+                        DB::table('cartitems')->where('cartId', $cart->cartId)->delete();
+                    }
+                }
+
                 DB::commit();
 
                 // Stripe Checkout
@@ -142,7 +169,7 @@ class OrderController extends Controller
                     'cancel_url' => url('/api/checkout-cancel'), // Tạm
                 ]);
 
-                return response()->json(['message' => 'Redirect to Stripe', 'url' => $session->url], 200);
+                return response()->json(['success' => true, 'message' => 'Redirect to Stripe', 'redirectUrl' => $session->url], 200);
             }
 
 
@@ -252,15 +279,15 @@ class OrderController extends Controller
                         $order->save();
                     }
                 }
-                return response()->json(['message' => 'Payment successful', 'data' => $request->all()], 200);
+                return redirect()->route('home')->with('success', 'Thanh toán VNPay thành công! Đơn hàng của bạn đang được xử lý.');
             } else {
                 // That bai
                  $orderId = $request->vnp_TxnRef;
                  Payment::where('orderId', $orderId)->update(['status' => 'failed']);
-                return response()->json(['message' => 'Payment failed', 'data' => $request->all()], 400);
+                return redirect()->route('home')->with('error', 'Thanh toán VNPay thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.');
             }
         } else {
-            return response()->json(['message' => 'Invalid signature'], 400);
+            return redirect()->route('home')->with('error', 'Giao dịch không hợp lệ.');
         }
     }
 

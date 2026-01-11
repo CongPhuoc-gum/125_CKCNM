@@ -2,11 +2,13 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <title>Chi tiết sản phẩm | SnackFood</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ $product->name }} | SnackFood</title>
   <link rel="stylesheet" href="{{ asset('css/product.css') }}">
 </head>
 <body>
 
+<!-- ===== HEADER - GIỐNG Y HỆT HOME ===== -->
 <header>
   <a class="brand" href="{{ route('home') }}">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoV0_K78ROk_yDSrCyKON-JkXA5uWF9gxe4A&s" alt="SnackFood">
@@ -40,11 +42,16 @@
     🛒 <span id="cart-count">0</span>
   </button>
   
-  <div id="user-area"></div>
+  <!-- ✅ CRITICAL: Phải có data attributes này để header.js hoạt động -->
+  <div id="user-area" 
+       data-login-url="{{ route('login') }}"
+       data-register-url="{{ route('register') }}">
+  </div>
 </header>
 
 <div id="dropdown-overlay"></div>
 
+<!-- ===== PRODUCT DETAIL CONTENT ===== -->
 <div class="product-container">
   <div class="breadcrumb" id="breadcrumb">
     <a href="{{ route('home') }}">Trang chủ</a> > 
@@ -53,12 +60,17 @@
   </div>
 
   <div class="product-detail">
-    <!-- IMAGE - ✅ FIX: Thêm storage/ vào đường dẫn -->
+    <!-- IMAGE với fallback giống trang home -->
     <div class="product-images">
-      <img id="mainImg" 
-           src="{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}" 
-           alt="{{ $product->name }}"
-           onerror="this.src='{{ asset('images/no-image.png') }}'">
+      <div class="product-image-wrapper {{ !$product->imageUrl ? 'no-image' : '' }}" id="mainImageWrapper">
+        @if($product->imageUrl)
+          <img id="mainImg" 
+               src="{{ asset('storage/' . $product->imageUrl) }}" 
+               alt="{{ $product->name }}"
+               onerror="this.parentElement.classList.add('no-image'); this.style.display='none'; this.nextElementSibling.style.display='block';">
+        @endif
+        <div class="product-fallback-text">{{ $product->name }}</div>
+      </div>
       <div class="thumbs" id="thumbs"></div>
     </div>
 
@@ -100,7 +112,7 @@
       <div class="qty">
         <span>Số lượng:</span>
         <button onclick="changeQty(-1)">−</button>
-        <input id="qty" value="1">
+        <input id="qty" value="1" type="number" min="1" max="{{ $product->quantity }}">
         <button onclick="changeQty(1)">+</button>
       </div>
       
@@ -111,6 +123,7 @@
     </div>
   </div>
    
+  <!-- REVIEWS -->
   <div class="review-section">
     <h2>Đánh giá của khách hàng</h2>
 
@@ -139,7 +152,7 @@
   © <strong>SnackFood</strong> — Chuyên đồ khô chất lượng. Liên hệ: 0900 123 456 · email: info@snackfood.vn
 </footer>
 
-<!-- ===== CART OVERLAY - ✅ Cart sẽ được render bởi cart.js ===== -->
+<!-- ===== CART OVERLAY ===== -->
 <div id="cart-overlay">
   <div class="cart-panel">
     <div class="cart-header">
@@ -163,120 +176,7 @@
   </div>    
 </div>
 
-<script>
-  const toggleBtn = document.getElementById('menu-toggle');
-  const dropdown = document.getElementById('dropdown-menu');
-  const overlay = document.getElementById('dropdown-overlay');
-
-  toggleBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    dropdown.classList.toggle('show');
-    overlay.classList.toggle('show');
-    toggleBtn.classList.toggle('active');
-  });
-
-  overlay.addEventListener('click', closeMenu);
-  document.addEventListener('click', closeMenu);
-
-  function closeMenu(){
-    dropdown.classList.remove('show');
-    overlay.classList.remove('show');
-    toggleBtn.classList.remove('active');
-  }
-</script>
-
-<script>
-  const cartBtn = document.getElementById('cart-btn');
-  const cartOverlay = document.getElementById('cart-overlay');
-  const closeCart = document.getElementById('close-cart');
-  const closeCartBtn = document.querySelector('.close-cart-btn');
-
-  cartBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    cartOverlay.classList.add('show');
-  });
-
-  closeCart.addEventListener('click', function () {
-    cartOverlay.classList.remove('show');
-  });
-
-  closeCartBtn.addEventListener('click', function () {
-    cartOverlay.classList.remove('show');
-  });
-
-  cartOverlay.addEventListener('click', function (e) {
-    if (e.target === cartOverlay) {
-      cartOverlay.classList.remove('show');
-    }
-  });
-</script>
-
-<script>
-  // Hiển thị thông tin user hoặc nút đăng nhập
-  (function(){
-    var userArea = document.getElementById('user-area');
-    var uname = localStorage.getItem('snack_username');
-    
-    if(uname){
-      // Đã đăng nhập - hiển thị tên và nút đăng xuất
-      userArea.innerHTML = ''
-        + '<span style="color:#2b2b2b;font-weight:700">Xin chào, ' + encodeHTML(uname) + '</span>'
-        + '<button id="logoutBtn" style="background:linear-gradient(90deg,#ff4b2b,#e63e20);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;margin-left:10px">Đăng xuất</button>';
-
-      document.getElementById('logoutBtn').addEventListener('click', function(){
-        localStorage.removeItem('snack_username');
-        window.location.reload();
-      });
-    } else {
-      // Chưa đăng nhập - hiển thị nút đăng nhập
-      userArea.innerHTML = ''
-        + '<a href="{{ route("login") }}" style="background:linear-gradient(90deg,#ff4b2b,#e63e20);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:700;text-decoration:none;display:inline-block">Đăng nhập</a>';
-    }
-    
-    function encodeHTML(s){
-      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
-    }
-  })();
-
-  // Hàm xử lý thêm vào giỏ hàng
-  function handleAddToCart() {
-    var uname = localStorage.getItem('snack_username');
-    if(!uname){
-      alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
-      window.location.href = '{{ route("login") }}';
-      return;
-    }
-    // Gọi hàm addToCart từ cart.js
-    const qty = parseInt(document.getElementById('qty').value) || 1;
-    addToCart({{ $product->productId }}, qty);
-  }
-
-  // Hàm xử lý mua ngay
-  function handleBuyNow() {
-    var uname = localStorage.getItem('snack_username');
-    if(!uname){
-      alert('Vui lòng đăng nhập để mua hàng!');
-      window.location.href = '{{ route("login") }}';
-      return;
-    }
-    // Thêm vào giỏ rồi chuyển đến checkout
-    const qty = parseInt(document.getElementById('qty').value) || 1;
-    addToCart({{ $product->productId }}, qty);
-    window.location.href = '{{ route("checkout") }}';
-  }
-
-  // Hàm thay đổi số lượng
-  function changeQty(delta) {
-    const qtyInput = document.getElementById('qty');
-    let currentQty = parseInt(qtyInput.value) || 1;
-    currentQty += delta;
-    if (currentQty < 1) currentQty = 1;
-    if (currentQty > {{ $product->quantity }}) currentQty = {{ $product->quantity }};
-    qtyInput.value = currentQty;
-  }
-</script>
-
-<!-- ✅ QUAN TRỌNG: Truyền product data từ Laravel sang JavaScript với đường dẫn ảnh đầy đủ -->
+<!-- ===== PRODUCT DATA - TRUYỀN TỪ LARAVEL SANG JS ===== -->
 <script>
   window.productData = {
     id: {{ $product->productId }},
@@ -290,8 +190,11 @@
   };
 </script>
 
-<script defer src="{{ asset('js/auth.js') }}"></script>
+<!-- ===== LOAD JS FILES - THỨ TỰ QUAN TRỌNG ===== -->
 <script defer src="{{ asset('js/cart.js') }}"></script>
-<script src="{{ asset('js/product-detail.js') }}"></script>
+<script defer src="{{ asset('js/auth.js') }}"></script>
+<script defer src="{{ asset('js/header.js') }}"></script>
+<script defer src="{{ asset('js/product-detail.js') }}"></script>
+
 </body>
 </html>

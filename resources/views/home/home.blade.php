@@ -7,6 +7,23 @@
   <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 </head>
 <body>
+
+  @if(session('success'))
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        alert('✅ {{ session('success') }}');
+      });
+    </script>
+  @endif
+
+  @if(session('error'))
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        alert('❌ {{ session('error') }}');
+      });
+    </script>
+  @endif
+
   <div class="site">
     <header>
       <a class="brand" href="{{ route('home') }}">
@@ -23,11 +40,8 @@
         </button>
         <div id="dropdown-menu" class="dropdown-menu">
           <a href="#products" class="menu-item">🔥 Bán Chạy</a>
-          <a href="#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
-          <a href="#" class="menu-item">🦑 Mực Khô</a>
-          <a href="#" class="menu-item">🐟 Cá Khô</a>
-          <a href="#" class="menu-item">🥜 Hạt & Snack</a>
-          <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
+          <a href="{{ route('home') }}" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+          <!-- Categories will be inserted here dynamically -->
           <a href="#contact" class="menu-item">📞 Liên Hệ</a>
         </div>
       </div>
@@ -56,20 +70,31 @@
         <button class="carousel-btn prev" aria-label="Trước">‹</button>
         <div class="carousel-track">
           @forelse($products->take(7) as $product)
-          <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
-            {{-- ✅ FIX: Thêm /storage/ trước imageUrl --}}
-            <img src="{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}" 
-                 alt="{{ $product->name }}"
-                 onerror="this.src='{{ asset('images/no-image.png') }}'">
-            <h3>{{ $product->name }}</h3>
-            <div style="color:#666;font-size:14px">{{ Str::limit($product->description, 40) }}</div>
+          <div class="card">
+            <a href="{{ route('product.show', $product->productId) }}" style="text-decoration: none; color: inherit; display: block;">
+              {{-- Card Image với fallback --}}
+              <div class="card-image-wrapper {{ !$product->imageUrl ? 'no-image' : '' }}">
+                @if($product->imageUrl)
+                  <img src="{{ asset('storage/' . $product->imageUrl) }}" 
+                       alt="{{ $product->name }}"
+                       onerror="this.parentElement.classList.add('no-image'); this.style.display='none'; this.nextElementSibling.style.display='block';">
+                @endif
+                <div class="fallback-text">{{ $product->name }}</div>
+              </div>
+
+              <h3>{{ $product->name }}</h3>
+              <div style="color:#666;font-size:14px">{{ Str::limit($product->description, 40) }}</div>
+            </a>
+            
             <div class="price-row">
               <div class="price">{{ number_format($product->price, 0, ',', '.') }}₫</div>
-              <button class="btn-sm" onclick="event.preventDefault(); addToCart({{ $product->productId }});">Thêm vào giỏ</button>
+              <button class="btn-sm" onclick="event.stopPropagation(); addToCart({{ $product->productId }});">
+                Thêm vào giỏ
+              </button>
             </div>
-          </a>
+          </div>
           @empty
-          <p style="text-align:center;color:#999">Không có sản phẩm</p>
+          <p style="text-align:center;color:#999;padding:40px;">Không có sản phẩm</p>
           @endforelse
         </div>
         <button class="carousel-btn next" aria-label="Tiếp">›</button>
@@ -78,19 +103,30 @@
       <h2 id="best" style="margin-top:28px">Tất cả sản phẩm</h2>
       <div class="grid" style="margin-bottom:18px">
         @forelse($products as $product)
-        <a href="{{ route('product.show', $product->productId) }}" class="card" style="text-decoration: none; color: inherit;">
-          {{-- ✅ FIX: Thêm /storage/ trước imageUrl --}}
-          <img src="{{ $product->imageUrl ? asset('storage/' . $product->imageUrl) : asset('images/no-image.png') }}" 
-               alt="{{ $product->name }}"
-               onerror="this.src='{{ asset('images/no-image.png') }}'">
-          <h3>{{ $product->name }}</h3>
+        <div class="card">
+          <a href="{{ route('product.show', $product->productId) }}" style="text-decoration: none; color: inherit; display: block;">
+            {{-- Card Image với fallback --}}
+            <div class="card-image-wrapper {{ !$product->imageUrl ? 'no-image' : '' }}">
+              @if($product->imageUrl)
+                <img src="{{ asset('storage/' . $product->imageUrl) }}" 
+                     alt="{{ $product->name }}"
+                     onerror="this.parentElement.classList.add('no-image'); this.style.display='none'; this.nextElementSibling.style.display='block';">
+              @endif
+              <div class="fallback-text">{{ $product->name }}</div>
+            </div>
+
+            <h3>{{ $product->name }}</h3>
+          </a>
+          
           <div class="price-row">
             <div class="price">{{ number_format($product->price, 0, ',', '.') }}₫</div>
-            <button class="btn-sm" onclick="event.preventDefault(); addToCart({{ $product->productId }});">Thêm vào giỏ</button>
+            <button class="btn-sm" onclick="event.stopPropagation(); addToCart({{ $product->productId }});">
+              Thêm vào giỏ
+            </button>
           </div>
-        </a>
+        </div>
         @empty
-        <p style="text-align:center;color:#999">Không có sản phẩm</p>
+        <p style="text-align:center;color:#999;padding:40px;grid-column:1/-1;">Không có sản phẩm</p>
         @endforelse
       </div>
     </main>
@@ -124,8 +160,11 @@
     </div>
   </div>
 
+  <!-- ===== SCRIPTS - THỨ TỰ QUAN TRỌNG ===== -->
+  <script defer src="{{ asset('js/cart.js') }}"></script>
   <script defer src="{{ asset('js/auth.js') }}"></script>
   <script defer src="{{ asset('js/header.js') }}"></script>
+  <script defer src="{{ asset('js/categories.js') }}"></script>
   <script defer src="{{ asset('js/cart.js') }}"></script>
 
 </body>

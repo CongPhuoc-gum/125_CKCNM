@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = window.location.origin + '/api';
 let currentPage = 1;
 
 async function loadUsers(page = 1) {
@@ -22,21 +22,21 @@ async function loadUsers(page = 1) {
 
         const result = await response.json();
         const data = result.data;
-        
+
         displayUsers(data.data);
         displayPagination(data);
         currentPage = page;
 
     } catch (error) {
         console.error('Error loading users:', error);
-        document.getElementById('usersTable').innerHTML = 
+        document.getElementById('usersTable').innerHTML =
             '<tr><td colspan="8" class="text-center">Lỗi tải dữ liệu</td></tr>';
     }
 }
 
 function displayUsers(users) {
     const tbody = document.getElementById('usersTable');
-    
+
     if (!users || users.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không có người dùng nào</td></tr>';
         return;
@@ -188,13 +188,13 @@ function displayPagination(data) {
     if (!container) return;
 
     const { current_page, last_page } = data;
-    
+
     let html = '';
-    
+
     html += `<button onclick="loadUsers(${current_page - 1})" ${current_page === 1 ? 'disabled' : ''}>
         <i class="fas fa-chevron-left"></i>
     </button>`;
-    
+
     for (let i = 1; i <= last_page; i++) {
         if (i === 1 || i === last_page || (i >= current_page - 2 && i <= current_page + 2)) {
             html += `<button onclick="loadUsers(${i})" class="${i === current_page ? 'active' : ''}">${i}</button>`;
@@ -202,11 +202,11 @@ function displayPagination(data) {
             html += `<button disabled>...</button>`;
         }
     }
-    
+
     html += `<button onclick="loadUsers(${current_page + 1})" ${current_page === last_page ? 'disabled' : ''}>
         <i class="fas fa-chevron-right"></i>
     </button>`;
-    
+
     container.innerHTML = html;
 }
 
@@ -226,12 +226,12 @@ function formatDate(dateString) {
 
 window.addEventListener('DOMContentLoaded', () => {
     loadUsers();
-    
+
     document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchUsers();
     });
 });
 
-document.getElementById('userDetailModal')?.addEventListener('click', function(e) {
+document.getElementById('userDetailModal')?.addEventListener('click', function (e) {
     if (e.target === this) closeUserModal();
 });
