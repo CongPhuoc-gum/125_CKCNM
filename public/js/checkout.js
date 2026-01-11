@@ -83,17 +83,106 @@ if (!window.API_URL) window.API_URL = '/api';
                 ? '/storage/' + item.product.imageUrl
                 : '/images/no-image.png';
 
-            wrap.innerHTML += `
-                <div class="order-item">
-                    <img src="${img}" onerror="this.src='/images/no-image.png'">
-                    <div class="order-info">
-                        <div class="order-name">${item.product?.name || 'Sản phẩm'}</div>
-                        <div class="order-qty">SL: ${item.quantity}</div>
+            const div = document.createElement('div');
+            div.className = 'order-item';
+            div.innerHTML = `
+                <img src="${img}" onerror="this.src='/images/no-image.png'">
+                <div class="order-info">
+                    <div class="order-name">${item.product?.name || 'Sản phẩm'}</div>
+                    <div class="order-qty-controls">
+                        <button class="qty-btn minus" data-id="${item.productId}">−</button>
+                        <span class="qty-display">${item.quantity}</span>
+                        <button class="qty-btn plus" data-id="${item.productId}">+</button>
                     </div>
-                    <div class="order-price">${formatPrice(item.price * item.quantity)}₫</div>
                 </div>
+                <div class="order-price">${formatPrice(item.price * item.quantity)}₫</div>
             `;
+            wrap.appendChild(div);
         });
+
+        // Add event listeners for quantity buttons
+        document.querySelectorAll('.qty-btn').forEach(btn => {
+            btn.addEventListener('click', handleQuantityChange);
+        });
+    }
+
+    // ===== QUANTITY CHANGE =====
+    async function handleQuantityChange(e) {
+        const btn = e.currentTarget;
+        const productId = parseInt(btn.dataset.id);
+        const isMinus = btn.classList.contains('minus');
+
+        try {
+            const cart = await getCart();
+            const item = cart.cartitems.find(i => i.productId === productId);
+            if (!item) return;
+
+            let newQty = isMinus ? item.quantity - 1 : item.quantity + 1;
+
+            if (newQty <= 0) {
+                // Remove item if quantity becomes 0
+                if (confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+                    await updateCartItem(productId, 0);
+                    await loadCheckoutCart();
+
+                    // Update cart count in header
+                    if (window.updateCartCount) window.updateCartCount();
+                }
+            } else {
+                await updateCartItem(productId, newQty);
+                await loadCheckoutCart();
+
+                // Update cart count in header
+                if (window.updateCartCount) window.updateCartCount();
+            }
+
+        } catch (e) {
+            console.error('Update quantity error:', e);
+            showToast('Không thể cập nhật số lượng!', 'error');
+        }
+    }
+
+    // ===== UPDATE CART ITEM =====
+    async function updateCartItem(productId, quantity) {
+        try {
+            // Lấy cart để tìm cartItemId
+            const cart = await getCart();
+            const item = cart.cartitems.find(i => i.productId === productId);
+            if (!item) throw new Error('Không tìm thấy sản phẩm');
+
+            // Nếu quantity = 0, xóa sản phẩm
+            if (quantity <= 0) {
+                const res = await fetch(`${API_URL}/cart/remove/${item.cartItemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                const json = await res.json();
+                if (!json.success) {
+                    throw new Error(json.message || 'Xóa thất bại');
+                }
+            } else {
+                // Cập nhật số lượng
+                const res = await fetch(`${API_URL}/cart/update/${item.cartItemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity })
+                });
+                const json = await res.json();
+                if (!json.success) {
+                    throw new Error(json.message || 'Cập nhật thất bại');
+                }
+            }
+        } catch (e) {
+            throw e;
+        }
     }
 
     // ===== TOTAL =====
@@ -216,7 +305,11 @@ if (!window.API_URL) window.API_URL = '/api';
     async function getCart() {
         try {
             const res = await fetch(`${API_URL}/cart`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
             const json = await res.json();
             return json.success ? json.data : null;
