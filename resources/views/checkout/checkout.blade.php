@@ -67,7 +67,7 @@
         <input type="text" id="fullname" placeholder="Họ và tên *" required>
         <input type="tel" id="phone" placeholder="Số điện thoại *" required>
         <input type="text" id="address" placeholder="Địa chỉ giao hàng *" required>
-        <textarea id="note" placeholder="Ghi chú cho người bán (nếu có)"></textarea>
+        <textarea id="note" placeholder="Ghi chú cho người bán (nếu có)" rows="3"></textarea>
       </section>
 
       <!-- PHƯƠNG THỨC THANH TOÁN -->
@@ -97,12 +97,12 @@
         </label>
 
         <label class="pay-option">
-          <input type="radio" name="pay" value="ewallet">
+          <input type="radio" name="pay" value="vnpay">
           <span class="pay-content">
             <span class="pay-icon">📱</span>
             <span class="pay-text">
-              <strong>Ví điện tử</strong>
-              <small>Momo, ZaloPay, VNPay</small>
+              <strong>VNPay</strong>
+              <small>Thanh toán qua VNPay</small>
             </span>
           </span>
         </label>
@@ -115,7 +115,10 @@
 
       <!-- Hiển thị danh sách sản phẩm trong giỏ -->
       <div id="order-items">
-        <p style="text-align:center;color:#999;padding:30px">Đang tải giỏ hàng...</p>
+        <div style="text-align:center;padding:30px">
+          <div style="font-size:40px;margin-bottom:12px">⏳</div>
+          <p style="color:#999;">Đang tải giỏ hàng...</p>
+        </div>
       </div>
 
       <div class="summary-divider"></div>
@@ -132,13 +135,13 @@
 
       <div class="summary-row total">
         <span>Tổng cộng</span>
-        <strong id="total">0₫</strong>
+        <strong id="total">30.000₫</strong>
       </div>
 
-      <button class="confirm-btn">
+      <button class="confirm-btn" type="button">
         <span>✅ Xác nhận đặt hàng</span>
       </button>
-      <button class="back-btn" onclick="window.location.href='{{ route('home') }}'">
+      <button class="back-btn" type="button" onclick="window.location.href='{{ route('home') }}'">
         ← Quay về trang chủ
       </button>
     </section>
@@ -157,26 +160,28 @@
   <div class="cart-panel">
     <div class="cart-header">
       <h3>🛒 Giỏ hàng</h3>
-      <button id="close-cart">✕</button>
+      <button id="close-cart" type="button">✕</button>
     </div>
 
-    <div class="cart-items"></div>
+    <div class="cart-items">
+      <!-- Cart items sẽ được load bởi cart.js -->
+    </div>
 
     <div class="cart-footer">
       <div class="cart-total">
         Tổng cộng: <strong>0₫</strong>
       </div>
       <a href="{{ route('checkout') }}" class="checkout-btn">Thanh toán</a>
-      <button class="close-cart-btn">Đóng giỏ hàng</button>
+      <button class="close-cart-btn" type="button">Đóng giỏ hàng</button>
     </div>
   </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
-<script defer src="{{ asset('js/auth.js') }}"></script>
-<script defer src="{{ asset('js/header.js') }}"></script>
-<script defer src="{{ asset('js/cart.js') }}"></script>
-<script defer src="{{ asset('js/checkout.js') }}"></script>
+<!-- ===== SCRIPTS - Thứ tự quan trọng ===== -->
+<script src="{{ asset('js/auth.js') }}"></script>
+<script src="{{ asset('js/cart.js') }}"></script>
+<script src="{{ asset('js/header.js') }}"></script>
+<script src="{{ asset('js/checkout.js') }}"></script>
 
 </body>
 </html>

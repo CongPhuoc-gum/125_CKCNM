@@ -46,6 +46,14 @@ Route::get('orders', function () {
     return view('order.orders');
 })->name('orders');
 
+Route::get('/contact', function () {
+    return view('contact.contact');
+})->name('contact');
+
+Route::get('/profile', function () {
+    return view('profile.profile');
+})->name('profile');
+
 
 //admin routes
 Route::prefix('admin')->middleware(['web'])->group(function () {
