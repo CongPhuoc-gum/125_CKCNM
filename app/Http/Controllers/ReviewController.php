@@ -23,15 +23,25 @@ class ReviewController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'userId' => 'required|exists:users,userId',
             'productId' => 'required|exists:products,productId',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string'
         ]);
 
-        $userId = $request->userId;
+        $userId = $request->user()->userId;
         $productId = $request->productId;
 
+        // Kiểm tra xem đã đánh giá sản phẩm này chưa
+        $existingReview = Review::where('userId', $userId)
+            ->where('productId', $productId)
+            ->exists();
+
+        if ($existingReview) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã đánh giá sản phẩm này rồi!'
+            ], 400);
+        }
         
         $hasPurchased = Order::where('userId', $userId)
             ->whereIn('status', ['completed', 'shipping']) 
@@ -42,6 +52,7 @@ class ReviewController extends Controller
 
         if (!$hasPurchased) {
             return response()->json([
+                'success' => false,
                 'message' => 'Bạn chưa mua sản phẩm này hoặc đơn hàng chưa hoàn thành, nên không thể đánh giá.'
             ], 403);
         }
@@ -56,7 +67,7 @@ class ReviewController extends Controller
             'createdAt' => now()
         ]);
 
-        return response()->json(['message' => 'Đánh giá thành công', 'data' => $review], 201);
+        return response()->json(['success' => true, 'message' => 'Đánh giá thành công', 'data' => $review], 201);
     }
 
     /**

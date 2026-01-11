@@ -1,14 +1,13 @@
 // ===== CART.JS - Quản lý Giỏ Hàng =====
-if (!window.API_URL) {
-    window.API_URL = 'http://localhost:8000/api';
-}
-const API_URL = window.API_URL;
+if (!window.API_URL) window.API_URL = '/api';
 
 // ===== EXPORT GLOBAL FUNCTIONS NGAY LẬP TỨC =====
 window.addToCart = addToCart;
 window.updateCartItemQuantity = updateCartItemQuantity;
 window.removeFromCart = removeFromCart;
 window.goCheckout = goCheckout;
+window.getCart = getCart;
+window.showToast = showToast;
 window.updateCartCount = updateCartCount; // ✅ Export luôn để tránh bị ghi đè
 
 // Thêm sản phẩm vào giỏ hàng
@@ -35,7 +34,7 @@ async function addToCart(productId, quantity = 1) {
         const result = await response.json();
 
         if (result.success) {
-            showToast('✅ Đã thêm vào giỏ hàng!');
+            showToast('Đã thêm vào giỏ hàng!');
             await updateCartCount();
 
             const cartOverlay = document.getElementById('cart-overlay');
@@ -126,7 +125,7 @@ async function removeFromCart(cartItemId, skipConfirm = false) {
         const result = await response.json();
         if (result.success) {
             if (!skipConfirm) {
-                showToast('✅ Đã xóa khỏi giỏ hàng');
+                showToast('Đã xóa khỏi giỏ hàng');
             }
             await updateCartUI();
             await updateCartCount();
@@ -191,7 +190,7 @@ async function updateCartUI() {
     if (cartTotalEl) cartTotalEl.innerText = formatPrice(total) + '₫';
 }
 
-// ✅ Cập nhật số lượng trên badge giỏ hàng
+//  Cập nhật số lượng trên badge giỏ hàng
 async function updateCartCount() {
     try {
         const cartCountEl = document.getElementById('cart-count');
@@ -289,7 +288,7 @@ function goCheckout() {
 
 // Khởi tạo khi trang load
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ Cart.js loaded');
+    console.log('Cart.js loaded');
 
     // Cart Overlay Management
     const cartOverlay = document.getElementById('cart-overlay');
@@ -326,13 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ✅ Initial load với delay nhỏ
+    // Initial load với delay nhỏ
     setTimeout(() => {
         updateCartCount();
     }, 100);
 });
 
-// ✅ Backup: Load lại khi window hoàn toàn ready
+// Backup: Load lại khi window hoàn toàn ready
 window.addEventListener('load', () => {
     updateCartCount();
 });

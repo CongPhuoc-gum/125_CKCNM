@@ -10,16 +10,34 @@
 
   @if(session('success'))
     <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        alert('✅ {{ session('success') }}');
+      document.addEventListener('DOMContentLoaded', async () => {
+        let attempts = 0;
+        while (typeof showToast !== 'function' && attempts < 10) {
+            await new Promise(r => setTimeout(r, 200));
+            attempts++;
+        }
+        if (typeof showToast === 'function') {
+            showToast('✅ {{ session('success') }}');
+        } else {
+            alert('✅ {{ session('success') }}');
+        }
       });
     </script>
   @endif
 
   @if(session('error'))
     <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        alert('❌ {{ session('error') }}');
+      document.addEventListener('DOMContentLoaded', async () => {
+        let attempts = 0;
+        while (typeof showToast !== 'function' && attempts < 10) {
+            await new Promise(r => setTimeout(r, 200));
+            attempts++;
+        }
+        if (typeof showToast === 'function') {
+            alert('❌ {{ session('error') }}'); // Errors might be better as alerts or specific error toasts
+        } else {
+            alert('❌ {{ session('error') }}');
+        }
       });
     </script>
   @endif

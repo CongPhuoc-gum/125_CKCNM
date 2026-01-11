@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Thanh toán | SnackFood</title>
+
   <link rel="stylesheet" href="{{ asset('css/home.css') }}">
   <link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
 </head>
@@ -22,26 +23,22 @@
   </a>
 
   <div class="menu-wrapper">
-    <button id="menu-toggle">
+    <button id="menu-toggle" type="button">
       Danh Mục <span class="arrow">▼</span>
     </button>
     <div id="dropdown-menu" class="dropdown-menu">
       <a href="{{ route('home') }}#products" class="menu-item">🔥 Bán Chạy</a>
       <a href="{{ route('home') }}#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
-      <a href="#" class="menu-item">🦑 Mực Khô</a>
-      <a href="#" class="menu-item">🐟 Cá Khô</a>
-      <a href="#" class="menu-item">🥜 Hạt & Snack</a>
-      <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
       <a href="{{ route('home') }}#contact" class="menu-item">📞 Liên Hệ</a>
     </div>
   </div>
 
-  <div class="search" role="search">
+  <div class="search">
     <input type="search" placeholder="Tìm kiếm sản phẩm...">
-    <button>🔎</button>
+    <button type="button">🔎</button>
   </div>
 
-  <button id="cart-btn">
+  <button id="cart-btn" type="button">
     🛒 <span id="cart-count">0</span>
   </button>
 
@@ -53,68 +50,48 @@
 
 <div id="dropdown-overlay"></div>
 
-<!-- ===== CHECKOUT CONTENT ===== -->
+<!-- ===== CHECKOUT ===== -->
 <main class="checkout-page">
 
   <h2 class="checkout-title">🧾 Thanh toán</h2>
 
   <div class="checkout-container">
 
+    <!-- LEFT -->
     <div class="left-column">
-      <!-- THÔNG TIN GIAO HÀNG -->
+
+      <!-- SHIPPING INFO -->
       <section class="checkout-box">
         <h3>📦 Thông tin giao hàng</h3>
-        <input type="text" id="fullname" placeholder="Họ và tên *" required>
-        <input type="tel" id="phone" placeholder="Số điện thoại *" required>
-        <input type="text" id="address" placeholder="Địa chỉ giao hàng *" required>
-        <textarea id="note" placeholder="Ghi chú cho người bán (nếu có)" rows="3"></textarea>
+        <input type="text" id="fullname" placeholder="Họ và tên *">
+        <input type="tel" id="phone" placeholder="Số điện thoại *">
+        <input type="text" id="address" placeholder="Địa chỉ giao hàng *">
+        <textarea id="note" rows="3" placeholder="Ghi chú (nếu có)"></textarea>
       </section>
 
-      <!-- PHƯƠNG THỨC THANH TOÁN -->
+      <!-- PAYMENT -->
       <section class="checkout-box">
         <h3>💳 Phương thức thanh toán</h3>
 
         <label class="pay-option">
           <input type="radio" name="pay" value="cod" checked>
-          <div class="card-content">
-            <div class="icon-box cod-icon">💵</div>
-            <span>Thanh toán khi nhận hàng (COD)</span>
-          </div>
-        </label>
-
-        <!-- VNPAY -->
-        <label class="payment-card">
-          <input type="radio" name="pay" value="vnpay">
-          <div class="card-content">
-            <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPay" class="payment-logo">
-            <span>Ví VNPAY</span>
-          </div>
+          <span>💵 Thanh toán khi nhận hàng (COD)</span>
         </label>
 
         <label class="pay-option">
           <input type="radio" name="pay" value="vnpay">
-          <span class="pay-content">
-            <span class="pay-icon">📱</span>
-            <span class="pay-text">
-              <strong>VNPay</strong>
-              <small>Thanh toán qua VNPay</small>
-            </span>
-          </span>
+          <span>📱 Thanh toán qua VNPay</span>
         </label>
-      </div>
-    </section>
-    
-      
+      </section>
+    </div>
 
-    <!-- TÓM TẮT ĐƠN HÀNG -->
+    <!-- RIGHT -->
     <section class="checkout-box summary">
       <h3>🛒 Đơn hàng của bạn</h3>
 
-      <!-- Hiển thị danh sách sản phẩm trong giỏ -->
       <div id="order-items">
         <div style="text-align:center;padding:30px">
-          <div style="font-size:40px;margin-bottom:12px">⏳</div>
-          <p style="color:#999;">Đang tải giỏ hàng...</p>
+          ⏳ Đang tải giỏ hàng...
         </div>
       </div>
 
@@ -136,9 +113,11 @@
       </div>
 
       <button class="confirm-btn" type="button">
-        <span>✅ Xác nhận đặt hàng</span>
+        ✅ Xác nhận đặt hàng
       </button>
-      <button class="back-btn" type="button" onclick="window.location.href='{{ route('home') }}'">
+
+      <button class="back-btn" type="button"
+              onclick="window.location.href='{{ route('home') }}'">
         ← Quay về trang chủ
       </button>
     </section>
@@ -147,7 +126,7 @@
 </main>
 
 <footer id="contact">
-  © <strong>SnackFood</strong> — Chuyên đồ khô chất lượng. Liên hệ: 0900 123 456 · email: info@snackfood.vn
+  © <strong>SnackFood</strong> — Chuyên đồ khô chất lượng
 </footer>
 
 </div>
@@ -160,21 +139,17 @@
       <button id="close-cart" type="button">✕</button>
     </div>
 
-    <div class="cart-items">
-      <!-- Cart items sẽ được load bởi cart.js -->
-    </div>
+    <div class="cart-items"></div>
 
     <div class="cart-footer">
-      <div class="cart-total">
-        Tổng cộng: <strong>0₫</strong>
-      </div>
+      <div class="cart-total">Tổng cộng: <strong>0₫</strong></div>
       <a href="{{ route('checkout') }}" class="checkout-btn">Thanh toán</a>
-      <button class="close-cart-btn" type="button">Đóng giỏ hàng</button>
+      <button class="close-cart-btn" type="button">Đóng</button>
     </div>
   </div>
 </div>
 
-<!-- ===== SCRIPTS - Thứ tự quan trọng ===== -->
+<!-- ===== SCRIPTS (CHUẨN – KHÔNG INLINE) ===== -->
 <script src="{{ asset('js/auth.js') }}"></script>
 <script src="{{ asset('js/cart.js') }}"></script>
 <script src="{{ asset('js/header.js') }}"></script>
