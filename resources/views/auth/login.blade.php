@@ -36,6 +36,31 @@
 
 <script src="/js/auth.js"></script>
 <script>
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        
+        if (!email || !password) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+        
+        await handleLogin(email, password);
+    });
+
+    // Xử lý nút Google login
+    document.querySelector('.google-btn').addEventListener('click', function() {
+        window.location.href = 'http://localhost:8000/api/auth/google';
+    });
+
+    // Xử lý nút Facebook (chưa implement)
+    document.querySelector('.facebook-btn').addEventListener('click', function() {
+        alert('Tính năng đăng nhập Facebook đang được phát triển!');
+    });
+    
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         

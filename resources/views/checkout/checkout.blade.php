@@ -4,10 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Thanh toán | SnackFood</title>
-
-  <!-- CSS dùng chung với HOME -->
   <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-  <!-- CSS riêng cho checkout -->
   <link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
 </head>
 <body>
@@ -105,15 +102,65 @@
         </label>
       </div>
     </section>
+    <div class="left-column">
+      <!-- THÔNG TIN GIAO HÀNG -->
+      <section class="checkout-box">
+        <h3>📦 Thông tin giao hàng</h3>
+        <input type="text" id="fullname" placeholder="Họ và tên *" required>
+        <input type="tel" id="phone" placeholder="Số điện thoại *" required>
+        <input type="text" id="address" placeholder="Địa chỉ giao hàng *" required>
+        <textarea id="note" placeholder="Ghi chú cho người bán (nếu có)"></textarea>
+      </section>
+
+      <!-- PHƯƠNG THỨC THANH TOÁN -->
+      <section class="checkout-box">
+        <h3>💳 Phương thức thanh toán</h3>
+
+        <label class="pay-option">
+          <input type="radio" name="pay" value="cod" checked>
+          <span class="pay-content">
+            <span class="pay-icon">💵</span>
+            <span class="pay-text">
+              <strong>Thanh toán khi nhận hàng (COD)</strong>
+              <small>Thanh toán bằng tiền mặt khi nhận hàng</small>
+            </span>
+          </span>
+        </label>
+
+        <label class="pay-option">
+          <input type="radio" name="pay" value="bank">
+          <span class="pay-content">
+            <span class="pay-icon">🏦</span>
+            <span class="pay-text">
+              <strong>Chuyển khoản ngân hàng</strong>
+              <small>Chuyển khoản trước, giao hàng sau</small>
+            </span>
+          </span>
+        </label>
+
+        <label class="pay-option">
+          <input type="radio" name="pay" value="ewallet">
+          <span class="pay-content">
+            <span class="pay-icon">📱</span>
+            <span class="pay-text">
+              <strong>Ví điện tử</strong>
+              <small>Momo, ZaloPay, VNPay</small>
+            </span>
+          </span>
+        </label>
+      </section>
+    </div>
 
     <!-- TÓM TẮT ĐƠN HÀNG -->
     <section class="checkout-box summary">
-      <h3>Đơn hàng</h3>
+      <h3>🛒 Đơn hàng của bạn</h3>
 
       <!-- Hiển thị danh sách sản phẩm trong giỏ -->
-      <div id="order-items" style="margin-bottom: 15px; max-height: 300px; overflow-y: auto;">
-        <!-- JavaScript sẽ render sản phẩm vào đây -->
+      <div id="order-items">
+        <p style="text-align:center;color:#999;padding:30px">Đang tải giỏ hàng...</p>
       </div>
+
+      <div class="summary-divider"></div>
 
       <div class="summary-row">
         <span>Tạm tính</span>
@@ -130,8 +177,10 @@
         <strong id="total">0₫</strong>
       </div>
 
-      <button class="confirm-btn" onclick="confirmOrder()">Xác nhận đặt hàng</button>
-      <button class="back-btn" onclick="goBackToHome()">
+      <button class="confirm-btn">
+        <span>✅ Xác nhận đặt hàng</span>
+      </button>
+      <button class="back-btn" onclick="window.location.href='{{ route('home') }}'">
         ← Quay về trang chủ
       </button>
     </section>
@@ -153,17 +202,13 @@
       <button id="close-cart">✕</button>
     </div>
 
-    <div class="cart-items">
-      <!-- updateCartUI() sẽ render dữ liệu giỏ hàng vào đây -->
-    </div>
+    <div class="cart-items"></div>
 
     <div class="cart-footer">
       <div class="cart-total">
         Tổng cộng: <strong>0₫</strong>
       </div>
-      <a href="{{ route('checkout') }}" class="checkout-btn" style="text-decoration: none; display: block; text-align: center;">
-        Thanh toán
-      </a>
+      <a href="{{ route('checkout') }}" class="checkout-btn">Thanh toán</a>
       <button class="close-cart-btn">Đóng giỏ hàng</button>
     </div>
   </div>
@@ -403,6 +448,7 @@
 <script defer src="{{ asset('js/auth.js') }}"></script>
 <script defer src="{{ asset('js/header.js') }}"></script>
 <script defer src="{{ asset('js/cart.js') }}"></script>
+<script defer src="{{ asset('js/checkout.js') }}"></script>
 
 </body>
 </html>
