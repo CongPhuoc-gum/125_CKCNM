@@ -191,13 +191,23 @@ if (!window.API_URL) window.API_URL = '/api';
             });
 
             const result = await res.json();
-            if (res.ok) {
-                showToast('Đặt hàng thành công!', 'success');
-                setTimeout(() => window.location.href = '/orders', 1500);
+
+            if (res.ok && result.success) {
+                // Check if payment gateway redirect is required
+                if (result.redirectUrl) {
+                    // For VNPay or Stripe - redirect to payment gateway
+                    console.log('Redirecting to payment gateway:', result.redirectUrl);
+                    window.location.href = result.redirectUrl;
+                } else {
+                    // For COD - show success and redirect to orders page
+                    showToast('Đặt hàng thành công!', 'success');
+                    setTimeout(() => window.location.href = '/orders', 1500);
+                }
             } else {
                 showToast(result.message || 'Đặt hàng thất bại!', 'error');
             }
         } catch (e) {
+            console.error('Checkout error:', e);
             showToast('Lỗi hệ thống!', 'error');
         }
     }

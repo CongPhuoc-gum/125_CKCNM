@@ -2,6 +2,8 @@
 if (!window.API_URL) window.API_URL = '/api';
 
 let currentFilter = 'all';
+let currentReviewProduct = null;
+let selectedRating = 0;
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadOrders();
     setupFilters();
+    setupReviewModal();
 });
 
 // ===== FILTER =====
@@ -24,6 +27,17 @@ function setupFilters() {
             filterBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentFilter = btn.dataset.status;
+
+            // Filter locally or reload
+            const allCards = document.querySelectorAll('.order-card');
+            if (currentFilter === 'all') {
+                allCards.forEach(card => card.style.display = 'block');
+            } else {
+                allCards.forEach(card => {
+                    card.style.display = card.dataset.status === currentFilter ? 'block' : 'none';
+                });
+            }
+            // For now, let's keep it simple and just reload for safety if we want strict fitlering
             loadOrders();
         });
     });
@@ -78,7 +92,7 @@ function displayOrders(orders) {
     ordersList.style.display = 'block';
 
     ordersList.innerHTML = orders.map(order => `
-        <div class="order-card">
+        <div class="order-card" data-status="${order.status}">
             <div class="order-header">
                 <div>
                     <span class="order-id">#${order.orderId}</span>
@@ -111,7 +125,7 @@ function showEmptyOrders() {
     document.getElementById('empty-orders').style.display = 'flex';
 }
 
-// ===== STATUS =====
+// ===== STATUS BADGE =====
 function getStatusBadge(status) {
     const map = {
         pending: ['Chờ xử lý', '#FF9800'],
@@ -124,13 +138,28 @@ function getStatusBadge(status) {
     return `<span class="status-badge" style="background:${color}">${text}</span>`;
 }
 
-// ===== FORMAT =====
+// ===== FORMAT HELPERS =====
 function formatDate(d) {
-    const date = new Date(d);
-    return date.toLocaleString('vi-VN');
+    return new Date(d).toLocaleString('vi-VN');
 }
 function formatPrice(p) {
     return Number(p).toLocaleString('vi-VN');
+}
+function getPaymentMethod(method) {
+    const map = {
+        'cod': '💵 Thanh toán khi nhận hàng',
+        'vnpay': '💳 VNPay',
+        'stripe': '💳 Stripe'
+    };
+    return map[method] || method || 'Không xác định';
+}
+function getPaymentStatus(status) {
+    const map = {
+        'pending': '⏳ Chờ thanh toán',
+        'paid': '✅ Đã thanh toán',
+        'failed': '❌ Thất bại'
+    };
+    return map[status] || status || 'Chờ cập nhật';
 }
 
 // ===== ORDER DETAIL =====
@@ -139,41 +168,119 @@ async function viewOrderDetails(orderId) {
     const modal = document.getElementById('order-detail-modal');
     const body = document.getElementById('modal-body');
     document.getElementById('modal-order-id').textContent = `#${orderId}`;
+
     modal.style.display = 'flex';
-    body.innerHTML = '⏳ Đang tải...';
+    body.innerHTML = '<div style="text-align:center;padding:40px;"><div class="loading-spinner"></div><p>Đang tải...</p></div>';
 
     try {
         const res = await fetch(`${window.API_URL}/orders/${orderId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (!res.ok) throw new Error('Failed to load order');
+
         const order = await res.json();
-        displayOrderDetails(order);
-    } catch {
-        body.innerHTML = '❌ Không tải được đơn hàng';
+
+        // Fetch reviews if completed
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        let reviewedProductIds = [];
+
+        if (userData.userId && order.status === 'completed') {
+            try {
+                const productIds = order.items.map(i => i.productId);
+                const checks = await Promise.all(productIds.map(async (pid) => {
+                    const r = await fetch(`${window.API_URL}/products/${pid}/reviews`);
+                    if (r.ok) {
+                        const reviews = await r.json();
+                        return reviews.some(rv => rv.userId === userData.userId) ? pid : null;
+                    }
+                    return null;
+                }));
+                reviewedProductIds = checks.filter(id => id !== null);
+            } catch (e) {
+                console.warn('Review check failed', e);
+            }
+        }
+
+        displayOrderDetails(order, reviewedProductIds);
+    } catch (e) {
+        console.error(e);
+        body.innerHTML = '<div style="text-align:center;padding:40px;color:red">❌ Không tải được đơn hàng</div>';
     }
 }
 
-function displayOrderDetails(order) {
+function displayOrderDetails(order, reviewedProductIds = []) {
     const body = document.getElementById('modal-body');
+    const isCompleted = order.status === 'completed';
     const canCancel = ['pending', 'processing'].includes(order.status);
 
-    body.innerHTML = `
-        <h4>🛍️ Sản phẩm</h4>
-        ${order.items.map(i => `
-            <div class="detail-item">
-                <div>${i.product?.name || 'Sản phẩm'} × ${i.quantity}</div>
-                <div>${formatPrice(i.price * i.quantity)}₫</div>
+    const itemsHtml = order.items.map(item => {
+        const isReviewed = reviewedProductIds.includes(item.productId);
+        const imageUrl = item.product?.imageUrl ? `/storage/${item.product.imageUrl}` : '/images/placeholder.png';
+
+        return `
+        <div class="detail-item">
+            <div class="item-image">
+                <img src="${imageUrl}" onerror="this.src='/images/placeholder.png'" alt="Product">
             </div>
-        `).join('')}
+            <div class="item-info">
+                <h4>${item.product?.name || `Sản phẩm #${item.productId}`}</h4>
+                <div class="item-meta">
+                    <span>${formatPrice(item.price)}₫ x ${item.quantity}</span>
+                    <span class="item-subtotal">${formatPrice(item.price * item.quantity)}₫</span>
+                </div>
+                
+                ${isCompleted && !isReviewed ? `
+                    <button class="review-btn-small" onclick="openReviewModal(${item.productId}, '${(item.product?.name || '').replace(/'/g, "\\'")}', '${imageUrl}')">
+                        ⭐ Đánh giá
+                    </button>
+                ` : ''}
+                
+                ${isReviewed ? `<span class="reviewed-badge">✅ Đã đánh giá</span>` : ''}
+            </div>
+        </div>
+        `;
+    }).join('');
 
-        <h4>👤 Khách hàng</h4>
-        <p>${order.customerName} - ${order.phone}</p>
-        <p>${order.shippingAddress}</p>
+    body.innerHTML = `
+        <div class="detail-section">
+            <h4 class="section-title">🛍️ Sản phẩm</h4>
+            <div class="detail-items-list">
+                ${itemsHtml}
+            </div>
+        </div>
 
-        ${canCancel ? `<button class="cancel-order-btn" onclick="cancelOrder(${order.orderId})">Hủy đơn</button>` : ''}
+        <div class="detail-row two-cols">
+            <div class="detail-section">
+                <h4 class="section-title">👤 Khách hàng</h4>
+                <div class="info-group">
+                    <p><strong>Họ tên:</strong> ${order.customerName}</p>
+                    <p><strong>SĐT:</strong> ${order.phone}</p>
+                    <p><strong>Địa chỉ:</strong> ${order.shippingAddress}</p>
+                    ${order.note ? `<p><strong>Ghi chú:</strong> ${order.note}</p>` : ''}
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h4 class="section-title">💳 Thanh toán</h4>
+                <div class="info-group">
+                    <p><strong>Phương thức:</strong> ${getPaymentMethod(order.payment?.method)}</p>
+                    <p><strong>Trạng thái:</strong> ${getPaymentStatus(order.payment?.status)}</p>
+                </div>
+            </div>
+        </div>
 
-        <div class="detail-total">
-            <strong>Tổng: ${formatPrice(order.totalAmount)}₫</strong>
+        ${canCancel ? `
+        <div class="action-footer">
+            <button class="cancel-order-btn" onclick="cancelOrder(${order.orderId})">
+                ❌ Hủy đơn hàng
+            </button>
+        </div>
+        ` : ''}
+
+        <div class="detail-total-bar">
+            <span>Tổng cộng</span>
+            <strong>${formatPrice(order.totalAmount)}₫</strong>
         </div>
     `;
 }
@@ -184,17 +291,144 @@ function closeOrderModal() {
 
 // ===== CANCEL =====
 async function cancelOrder(orderId) {
-    if (!confirm('Bạn chắc chắn muốn hủy đơn?')) return;
+    if (!confirm('⚠️ Bạn có chắc muốn hủy đơn hàng này?\nHành động này không thể hoàn tác.')) {
+        return;
+    }
 
     const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${window.API_URL}/orders/${orderId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const result = await res.json();
 
-    const res = await fetch(`${window.API_URL}/orders/${orderId}/cancel`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
+        if (res.ok && result.success) {
+            alert('✅ ' + result.message);
+            closeOrderModal();
+            loadOrders();
+        } else {
+            alert('❌ ' + (result.message || 'Lỗi hủy đơn'));
+        }
+    } catch (e) {
+        console.error(e);
+        alert('❌ Có lỗi xảy ra');
+    }
+}
+
+// ===== REVIEW FUNC =====
+function setupReviewModal() {
+    // Setup stars interaction
+    const stars = document.querySelectorAll('#star-rating .star');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const value = parseInt(star.dataset.value);
+            selectedRating = value;
+            updateStars(value);
+        });
+
+        star.addEventListener('mouseover', () => {
+            updateStars(parseInt(star.dataset.value));
+        });
+
+        star.addEventListener('mouseleave', () => {
+            updateStars(selectedRating);
+        });
+    });
+}
+
+function updateStars(rating) {
+    const stars = document.querySelectorAll('#star-rating .star');
+    const emojis = ['😶', '😢', '😞', '😐', '😊', '🤩'];
+    const textDesc = ['Chưa đánh giá', 'Tệ', 'Không hài lòng', 'Bình thường', 'Hài lòng', 'Tuyệt vời'];
+
+    stars.forEach(s => {
+        const val = parseInt(s.dataset.value);
+        s.classList.toggle('active', val <= rating);
+        s.style.transform = val <= rating ? 'scale(1.2)' : 'scale(1)';
     });
 
-    const result = await res.json();
-    alert(result.message || 'Đã hủy');
-    closeOrderModal();
-    loadOrders();
+    document.getElementById('rating-emoji').textContent = emojis[rating];
+    document.getElementById('rating-text').textContent = textDesc[rating];
 }
+
+function openReviewModal(productId, productName, productImg) {
+    currentReviewProduct = { productId, productName };
+    selectedRating = 0;
+
+    document.getElementById('review-product-name').textContent = productName;
+    document.getElementById('review-product-img').src = productImg || '/images/placeholder.png';
+    document.getElementById('review-comment-text').value = '';
+    updateStars(0);
+
+    document.getElementById('review-modal').style.display = 'flex';
+}
+
+function closeReviewModal() {
+    document.getElementById('review-modal').style.display = 'none';
+    currentReviewProduct = null;
+}
+
+async function submitReview() {
+    if (!currentReviewProduct) return;
+    const comment = document.getElementById('review-comment-text').value.trim();
+    if (selectedRating === 0) return alert('⚠️ Vui lòng chọn số sao!');
+
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${window.API_URL}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId: currentReviewProduct.productId,
+                rating: selectedRating,
+                comment
+            })
+        });
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+            alert('✅ Đánh giá thành công!');
+            closeReviewModal();
+            // Refresh modal details
+            // For simplicity, we just reload the order details if strictly needed, 
+            // or we could manually toggle the button in DOM like before. 
+            // Since we need orderId to viewOrderDetails, let's just do the DOM update.
+            const btns = document.querySelectorAll('.review-btn-small');
+            // This is a bit tricky since we don't have the context of the modal here easily
+            // except checking button sibling elements.
+            // Let's just simply close review modal and tell user success.
+            // But user wanted instant feedback.
+            // Let's reload order details? We don't have orderId here.
+
+            // Re-implement the DOM manipulation trick
+            const items = document.querySelectorAll('.detail-item');
+            items.forEach(item => {
+                if (item.innerHTML.includes(currentReviewProduct.productName)) {
+                    const btn = item.querySelector('.review-btn-small');
+                    if (btn) {
+                        const parent = btn.parentElement;
+                        btn.remove();
+                        const span = document.createElement('span');
+                        span.className = 'reviewed-badge';
+                        span.textContent = '✅ Đã đánh giá';
+                        parent.appendChild(span);
+                    }
+                }
+            });
+
+        } else {
+            alert('❌ ' + (result.message || 'Lỗi'));
+        }
+    } catch (e) {
+        console.error(e);
+        alert('❌ Lỗi hệ thống');
+    }
+}
+window.submitReview = submitReview; // bind to window just in case

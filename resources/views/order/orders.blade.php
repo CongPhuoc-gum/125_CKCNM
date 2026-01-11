@@ -68,13 +68,7 @@
     <button class="filter-btn" type="button" data-status="cancelled">❌ Đã hủy</button>
   </div>
 
-  <!-- Loading -->
-  <div id="orders-loading" class="orders-loading">
-    <div style="text-align:center;padding:60px 20px">
-      <div style="font-size:50px;margin-bottom:16px">⏳</div>
-      <p style="color:#666;font-size:16px">Đang tải đơn hàng...</p>
-    </div>
-  </div>
+
 
   <!-- Orders list -->
   <div id="orders-list" class="orders-list" style="display:none">

@@ -42,7 +42,7 @@
     🛒 <span id="cart-count">0</span>
   </button>
   
-  <!-- ✅ CRITICAL: Phải có data attributes này để header.js hoạt động -->
+  <!-- CRITICAL: Phải có data attributes này để header.js hoạt động -->
   <div id="user-area" 
        data-login-url="{{ route('login') }}"
        data-register-url="{{ route('register') }}">

@@ -82,6 +82,11 @@
           <input type="radio" name="pay" value="vnpay">
           <span>📱 Thanh toán qua VNPay</span>
         </label>
+
+        <label class="pay-option">
+          <input type="radio" name="pay" value="stripe">
+          <span>💳 Thanh toán qua Stripe</span>
+        </label>
       </section>
     </div>
 

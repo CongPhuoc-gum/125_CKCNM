@@ -212,33 +212,33 @@ public function destroy($id)
     }
 
     try {
-        // ✅ Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
+        // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
         if ($product->orderitems()->count() > 0) {
             return response()->json([
                 'message' => 'Không thể xóa sản phẩm này vì đã có trong đơn hàng. Bạn có thể ẩn sản phẩm thay vì xóa.'
             ], 400);
         }
 
-        // ✅ Xóa reviews của sản phẩm
+        // Xóa reviews của sản phẩm
         $product->reviews()->delete();
         
-        // ✅ Xóa cart items chứa sản phẩm này
+        // Xóa cart items chứa sản phẩm này
         $product->cartitems()->delete();
 
-        // ✅ Xóa ảnh nếu có
+        // Xóa ảnh nếu có
         if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
             Storage::disk('public')->delete($product->imageUrl);
             Log::info('Image deleted: ' . $product->imageUrl);
         }
 
-        // ✅ Xóa sản phẩm
+        // Xóa sản phẩm
         $product->delete();
 
         return response()->json(['message' => 'Product deleted successfully'], 200);
 
     } catch (\Exception $e) {
         Log::error('Product deletion failed: ' . $e->getMessage());
-        Log::error('Stack trace: ' . $e->getTraceAsString()); // ✅ Thêm log chi tiết
+        Log::error('Stack trace: ' . $e->getTraceAsString()); // Thêm log chi tiết
         
         return response()->json([
             'message' => 'Có lỗi xảy ra khi xóa sản phẩm',

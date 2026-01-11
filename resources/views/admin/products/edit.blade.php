@@ -203,12 +203,12 @@ document.getElementById('editProductForm').addEventListener('submit', async func
     try {
         console.log('Sending request to:', `/api/admin/products/${productId}`);
         
-        // ✅ FIX: Dùng /api/admin/products với Bearer token
+        // FIX: Dùng /api/admin/products với Bearer token
         const response = await fetch(`${API_URL}/admin/products/${productId}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Authorization': `Bearer ${token}` // ✅ QUAN TRỌNG!
+                'Authorization': `Bearer ${token}` // QUAN TRỌNG!
                 // Không cần X-CSRF-TOKEN khi dùng Bearer token
             },
             body: formData
