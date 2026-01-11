@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = window.location.origin + '/api';
 let currentPage = 1;
 
 async function loadOrders(page = 1) {
@@ -20,14 +20,14 @@ async function loadOrders(page = 1) {
 
         const result = await response.json();
         const data = result.data;
-        
+
         displayOrders(data.data);
         displayPagination(data);
         currentPage = page;
 
     } catch (error) {
         console.error('Error loading orders:', error);
-        document.getElementById('ordersTable').innerHTML = 
+        document.getElementById('ordersTable').innerHTML =
             '<tr><td colspan="7" class="text-center">Lỗi tải dữ liệu</td></tr>';
     }
 }
@@ -57,7 +57,7 @@ async function loadOrderStats() {
 
 function displayOrders(orders) {
     const tbody = document.getElementById('ordersTable');
-    
+
     if (!orders || orders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không có đơn hàng nào</td></tr>';
         return;
@@ -101,7 +101,7 @@ async function viewOrderDetail(orderId) {
         const order = await response.json();
 
         document.getElementById('detailOrderId').textContent = order.orderId;
-        
+
         let itemsHtml = '';
         if (order.items && order.items.length > 0) {
             itemsHtml = `
@@ -173,7 +173,7 @@ function closeDetailModal() {
 
 async function updateOrderStatus(orderId, newStatus) {
     if (!newStatus) return;
-    
+
     if (!confirm(`Bạn có chắc muốn cập nhật trạng thái đơn hàng?`)) {
         return;
     }
@@ -210,13 +210,13 @@ function displayPagination(data) {
     if (!container) return;
 
     const { current_page, last_page } = data;
-    
+
     let html = '';
-    
+
     html += `<button onclick="loadOrders(${current_page - 1})" ${current_page === 1 ? 'disabled' : ''}>
         <i class="fas fa-chevron-left"></i>
     </button>`;
-    
+
     for (let i = 1; i <= last_page; i++) {
         if (i === 1 || i === last_page || (i >= current_page - 2 && i <= current_page + 2)) {
             html += `<button onclick="loadOrders(${i})" class="${i === current_page ? 'active' : ''}">${i}</button>`;
@@ -224,11 +224,11 @@ function displayPagination(data) {
             html += `<button disabled>...</button>`;
         }
     }
-    
+
     html += `<button onclick="loadOrders(${current_page + 1})" ${current_page === last_page ? 'disabled' : ''}>
         <i class="fas fa-chevron-right"></i>
     </button>`;
-    
+
     container.innerHTML = html;
 }
 
@@ -260,12 +260,12 @@ function formatDate(dateString) {
 window.addEventListener('DOMContentLoaded', () => {
     loadOrders();
     loadOrderStats();
-    
+
     document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchOrders();
     });
 });
 
-document.getElementById('orderDetailModal')?.addEventListener('click', function(e) {
+document.getElementById('orderDetailModal')?.addEventListener('click', function (e) {
     if (e.target === this) closeDetailModal();
 });

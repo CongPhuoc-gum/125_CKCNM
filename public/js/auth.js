@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/api';
+const API_URL = window.location.origin + '/api';
 
 function saveRegisterData(data) {
     localStorage.setItem('register_data', JSON.stringify(data));
@@ -73,7 +73,7 @@ async function handleRegister(userData) {
 
         if (response.ok && data.success) {
             saveRegisterData(userData);
-            
+
             alert('✅ ' + (data.message || 'Mã OTP đã được gửi đến email của bạn!'));
 
             setTimeout(() => {
@@ -82,13 +82,13 @@ async function handleRegister(userData) {
         } else {
 
             let errorMsg = data.message || 'Đăng ký thất bại!';
-            
+
             if (data.errors) {
 
                 const firstError = Object.values(data.errors)[0];
                 errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
             }
-            
+
             alert('❌ ' + errorMsg);
         }
     } catch (error) {
@@ -102,7 +102,7 @@ async function handleRegister(userData) {
 async function handleVerifyOTP(otpCode) {
     try {
         const registerData = getRegisterData();
-        
+
         if (!registerData) {
             alert('❌ Phiên đăng ký đã hết hạn. Vui lòng đăng ký lại!');
             setTimeout(() => {
@@ -132,11 +132,11 @@ async function handleVerifyOTP(otpCode) {
 
             localStorage.setItem('token', data.data.token);
             localStorage.setItem('user', JSON.stringify(data.data.user));
-            
+
             clearRegisterData();
-            
+
             alert('✅ Đăng ký thành công!');
-            
+
             setTimeout(() => {
                 window.location.href = '/';
             }, 1000);
@@ -154,7 +154,7 @@ async function handleVerifyOTP(otpCode) {
 async function handleResendOTP() {
     try {
         const registerData = getRegisterData();
-        
+
         if (!registerData || !registerData.email) {
             alert('❌ Không tìm thấy thông tin email!');
             window.location.href = '/register';
@@ -181,14 +181,14 @@ async function handleResendOTP() {
             if (resendBtn) {
                 resendBtn.style.pointerEvents = 'none';
                 resendBtn.style.opacity = '0.5';
-                
+
                 let countdown = 60;
                 const originalText = resendBtn.textContent;
-                
+
                 const timer = setInterval(() => {
                     countdown--;
                     resendBtn.textContent = `Gửi lại (${countdown}s)`;
-                    
+
                     if (countdown <= 0) {
                         clearInterval(timer);
                         resendBtn.textContent = originalText;
@@ -211,7 +211,7 @@ async function handleResendOTP() {
 async function handleLogout() {
     try {
         const token = localStorage.getItem('token');
-        
+
         if (!token) {
             window.location.href = '/login';
             return;
@@ -229,13 +229,13 @@ async function handleLogout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         clearRegisterData();
-        
+
         alert('✅ Đăng xuất thành công!');
         window.location.href = '/login';
-        
+
     } catch (error) {
         console.error('Logout error:', error);
-        
+
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';

@@ -22,72 +22,189 @@
   background: #fff;
   padding: 22px;
   border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 }
 
 .checkout-box h3 {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   color: #2f7d32;
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 2px solid #e8f5e9;
+  padding-bottom: 10px;
 }
 
 .checkout-box input,
 .checkout-box textarea {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
   border: 1px solid #ddd;
   font-size: 14px;
+  transition: all 0.3s;
+}
+
+.checkout-box input:focus,
+.checkout-box textarea:focus {
+  border-color: #2f7d32;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47, 125, 50, 0.1);
 }
 
 .checkout-box textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
 }
 
-.pay-option {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 15px;
+/* --- PAYMENT METHODS STYLE --- */
+.payment-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
 }
 
+.payment-card:hover {
+  border-color: #a5d6a7;
+  background-color: #f1f8e9;
+}
+
+/* Hide default radio input */
+.payment-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Selected state */
+.payment-card:has(input:checked) {
+  border-color: #2f7d32;
+  background-color: #e8f5e9;
+  box-shadow: 0 4px 12px rgba(47, 125, 50, 0.15);
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.payment-logo {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+}
+
+.icon-box {
+  width: 40px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: #eee;
+  border-radius: 5px;
+}
+
+.payment-card span {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+/* Checkmark indicator */
+.payment-card::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+
+.payment-card:has(input:checked)::after {
+  border-color: #2f7d32;
+  background-color: #2f7d32;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+}
+
+/* --- SUMMARY --- */
 .summary {
   height: fit-content;
+  position: sticky;
+  top: 90px;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
+  color: #555;
+  font-size: 15px;
 }
 
 .summary-row.total {
-  font-size: 18px;
+  font-size: 20px;
   color: #2f7d32;
+  font-weight: 800;
+  border-top: 1px dashed #ddd;
+  padding-top: 15px;
+  margin-top: 10px;
 }
 
 .confirm-btn {
   width: 100%;
-  padding: 12px;
-  background: #2f7d32;
+  padding: 15px;
+  background: linear-gradient(135deg, #2f7d32 0%, #1b5e20 100%);
   color: #fff;
   border: none;
   border-radius: 10px;
   font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(47, 125, 50, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .confirm-btn:hover {
-  background: #256528;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(47, 125, 50, 0.4);
+}
+
+.confirm-btn:active {
+  transform: translateY(0);
 }
 
 .back-btn {
   width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  background: #eee;
+  margin-top: 15px;
+  padding: 12px;
+  background: #f5f5f5;
+  color: #666;
   border: none;
   border-radius: 10px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: #e0e0e0;
+  color: #333;
 }
