@@ -76,24 +76,19 @@
 
         <label class="pay-option">
           <input type="radio" name="pay" value="cod" checked>
-          <span class="pay-content">
-            <span class="pay-icon">💵</span>
-            <span class="pay-text">
-              <strong>Thanh toán khi nhận hàng (COD)</strong>
-              <small>Thanh toán bằng tiền mặt khi nhận hàng</small>
-            </span>
-          </span>
+          <div class="card-content">
+            <div class="icon-box cod-icon">💵</div>
+            <span>Thanh toán khi nhận hàng (COD)</span>
+          </div>
         </label>
 
-        <label class="pay-option">
-          <input type="radio" name="pay" value="bank">
-          <span class="pay-content">
-            <span class="pay-icon">🏦</span>
-            <span class="pay-text">
-              <strong>Chuyển khoản ngân hàng</strong>
-              <small>Chuyển khoản trước, giao hàng sau</small>
-            </span>
-          </span>
+        <!-- VNPAY -->
+        <label class="payment-card">
+          <input type="radio" name="pay" value="vnpay">
+          <div class="card-content">
+            <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPay" class="payment-logo">
+            <span>Ví VNPAY</span>
+          </div>
         </label>
 
         <label class="pay-option">
@@ -106,8 +101,10 @@
             </span>
           </span>
         </label>
-      </section>
-    </div>
+      </div>
+    </section>
+    
+      
 
     <!-- TÓM TẮT ĐƠN HÀNG -->
     <section class="checkout-box summary">

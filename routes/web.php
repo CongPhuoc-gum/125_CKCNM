@@ -25,8 +25,15 @@ Route::get('/verify-otp', function () {
     return view('auth.verify-otp');
 })->name('verify-otp');
 
-Route::get('/', function () {
-    $products = \App\Models\Product::where('status', 1)->get();
+Route::get('/', function (\Illuminate\Http\Request $request) {
+    $query = \App\Models\Product::where('status', 1);
+    
+    // Filter by category if provided
+    if ($request->has('category')) {
+        $query->where('categoryId', $request->category);
+    }
+    
+    $products = $query->get();
     return view('home.home', ['products' => $products]);
 })->name('home');
 

@@ -261,6 +261,14 @@ class AuthController extends Controller
                 ], 403);
             }
 
+            // Tạo cart nếu chưa có (cho người dùng cũ)
+            if (!$user->cart) {
+                Cart::create([
+                    'userId' => $user->userId,
+                    'createdAt' => now()
+                ]);
+            }
+
             // Tạo token
             $token = $user->createToken('auth_token')->plainTextToken;
 

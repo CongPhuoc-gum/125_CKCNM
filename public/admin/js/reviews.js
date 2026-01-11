@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = window.location.origin + '/api';
 let currentPage = 1;
 
 async function loadReviews(page = 1) {
@@ -20,21 +20,21 @@ async function loadReviews(page = 1) {
 
         const result = await response.json();
         const data = result.data;
-        
+
         displayReviews(data.data);
         displayPagination(data);
         currentPage = page;
 
     } catch (error) {
         console.error('Error loading reviews:', error);
-        document.getElementById('reviewsTable').innerHTML = 
+        document.getElementById('reviewsTable').innerHTML =
             '<tr><td colspan="7" class="text-center">Lỗi tải dữ liệu</td></tr>';
     }
 }
 
 function displayReviews(reviews) {
     const tbody = document.getElementById('reviewsTable');
-    
+
     if (!reviews || reviews.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không có đánh giá nào</td></tr>';
         return;
@@ -45,10 +45,10 @@ function displayReviews(reviews) {
             <td>${review.reviewId}</td>
             <td>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    ${review.product && review.product.imageUrl ? 
-                        `<img src="/storage/${review.product.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" alt="${review.product.name}">` 
-                        : ''
-                    }
+                    ${review.product && review.product.imageUrl ?
+            `<img src="/storage/${review.product.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" alt="${review.product.name}">`
+            : ''
+        }
                     <span><strong>${review.product ? review.product.name : 'N/A'}</strong></span>
                 </div>
             </td>
@@ -75,7 +75,7 @@ function displayReviews(reviews) {
 function viewReviewDetail(reviewId) {
     // Find review in current data
     const reviews = Array.from(document.querySelectorAll('#reviewsTable tr')).map((_, index) => index);
-    
+
     alert('Chi tiết đánh giá #' + reviewId + '\n\nChức năng này có thể mở rộng thêm modal hiển thị chi tiết.');
 }
 
@@ -117,13 +117,13 @@ function displayPagination(data) {
     if (!container) return;
 
     const { current_page, last_page } = data;
-    
+
     let html = '';
-    
+
     html += `<button onclick="loadReviews(${current_page - 1})" ${current_page === 1 ? 'disabled' : ''}>
         <i class="fas fa-chevron-left"></i>
     </button>`;
-    
+
     for (let i = 1; i <= last_page; i++) {
         if (i === 1 || i === last_page || (i >= current_page - 2 && i <= current_page + 2)) {
             html += `<button onclick="loadReviews(${i})" class="${i === current_page ? 'active' : ''}">${i}</button>`;
@@ -131,11 +131,11 @@ function displayPagination(data) {
             html += `<button disabled>...</button>`;
         }
     }
-    
+
     html += `<button onclick="loadReviews(${current_page + 1})" ${current_page === last_page ? 'disabled' : ''}>
         <i class="fas fa-chevron-right"></i>
     </button>`;
-    
+
     container.innerHTML = html;
 }
 
@@ -151,7 +151,7 @@ function formatDate(dateString) {
 
 window.addEventListener('DOMContentLoaded', () => {
     loadReviews();
-    
+
     document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchReviews();
     });

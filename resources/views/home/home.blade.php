@@ -7,6 +7,23 @@
   <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 </head>
 <body>
+
+  @if(session('success'))
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        alert('✅ {{ session('success') }}');
+      });
+    </script>
+  @endif
+
+  @if(session('error'))
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        alert('❌ {{ session('error') }}');
+      });
+    </script>
+  @endif
+
   <div class="site">
     <header>
       <a class="brand" href="{{ route('home') }}">
@@ -23,11 +40,8 @@
         </button>
         <div id="dropdown-menu" class="dropdown-menu">
           <a href="#products" class="menu-item">🔥 Bán Chạy</a>
-          <a href="#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
-          <a href="#" class="menu-item">🦑 Mực Khô</a>
-          <a href="#" class="menu-item">🐟 Cá Khô</a>
-          <a href="#" class="menu-item">🥜 Hạt & Snack</a>
-          <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
+          <a href="{{ route('home') }}" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+          <!-- Categories will be inserted here dynamically -->
           <a href="#contact" class="menu-item">📞 Liên Hệ</a>
         </div>
       </div>
@@ -150,6 +164,8 @@
   <script defer src="{{ asset('js/cart.js') }}"></script>
   <script defer src="{{ asset('js/auth.js') }}"></script>
   <script defer src="{{ asset('js/header.js') }}"></script>
+  <script defer src="{{ asset('js/categories.js') }}"></script>
+  <script defer src="{{ asset('js/cart.js') }}"></script>
 
 </body>
 </html>
