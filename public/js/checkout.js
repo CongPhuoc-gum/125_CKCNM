@@ -1,32 +1,10 @@
-// ===== CHECKOUT.JS - Xử lý Thanh Toán =====
-if (!window.API_URL) {
-    window.API_URL = 'http://localhost:8000/api';
-}
+if (!window.API_URL) window.API_URL = '/api';
 
 // ===== EXPORT GLOBAL FUNCTIONS =====
 window.getCart = getCart;
 window.completeCheckout = completeCheckout;
 
-// Lấy giỏ hàng
-async function getCart() {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-
-    try {
-        const response = await fetch(`${window.API_URL}/cart`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-        const result = await response.json();
-        return result.success ? result.data : null;
-    } catch (error) {
-        console.error('Error fetching cart:', error);
-        return null;
-    }
-}
+// getCart is now imported from cart.js
 
 // Hoàn thành thanh toán
 async function completeCheckout(paymentMethod, cartItems, totalAmount) {
@@ -52,9 +30,9 @@ async function completeCheckout(paymentMethod, cartItems, totalAmount) {
         });
 
         const result = await response.json();
-        
+
         if (result.success) {
-            alert('✅ Đơn hàng đã được tạo thành công!');
+            alert('Đơn hàng đã được tạo thành công!');
             return true;
         } else {
             alert('❌ ' + (result.message || 'Lỗi khi tạo đơn hàng'));

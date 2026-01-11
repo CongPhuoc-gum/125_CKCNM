@@ -57,14 +57,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders/user/{userId}', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
-
-    // Reviews
-    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 });
 
 // Payment callbacks
 Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
 Route::get('/stripe-return', [OrderController::class, 'stripeReturn']);
+
+// Reviews
+Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->middleware('auth:sanctum');
 
 // ========== ADMIN ROUTES ==========
 Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {

@@ -64,6 +64,7 @@
     <button class="filter-btn" data-status="processing">⏳ Đang xử lý</button>
     <button class="filter-btn" data-status="shipping">🚚 Đang giao</button>
     <button class="filter-btn" data-status="completed">✅ Hoàn thành</button>
+    <button class="filter-btn" data-status="cancelled">❌ Đã hủy</button>
   </div>
 
   <div id="orders-list" class="orders-list">
@@ -106,6 +107,51 @@
 <script defer src="{{ asset('js/header.js') }}"></script>
 <script defer src="{{ asset('js/cart.js') }}"></script>
 <script defer src="{{ asset('js/orders.js') }}"></script>
+
+<!-- ===== ORDER DETAILS MODAL ===== -->
+<div id="order-detail-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📦 Chi tiết đơn hàng <span id="modal-order-id"></span></h3>
+      <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- Content will be loaded here -->
+    </div>
+  </div>
+</div>
+
+<!-- ===== REVIEW MODAL ===== -->
+<div id="review-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content review-modal-content">
+    <div class="modal-header">
+      <h3>⭐ Đánh giá sản phẩm</h3>
+      <button class="modal-close" onclick="closeReviewModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="review-product-info" class="review-product-info"></div>
+      
+      <div class="review-rating">
+        <label>Đánh giá của bạn:</label>
+        <div class="stars" id="review-stars">
+          <span class="star" data-rating="1">★</span>
+          <span class="star" data-rating="2">★</span>
+          <span class="star" data-rating="3">★</span>
+          <span class="star" data-rating="4">★</span>
+          <span class="star" data-rating="5">★</span>
+        </div>
+        <p class="rating-text" id="rating-text">Chọn số sao</p>
+      </div>
+      
+      <div class="review-comment">
+        <label for="review-comment-text">Nhận xét của bạn:</label>
+        <textarea id="review-comment-text" rows="4" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
+      </div>
+      
+      <button class="submit-review-btn" onclick="submitReview()">Gửi đánh giá</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

@@ -131,7 +131,7 @@
         <strong id="total">0₫</strong>
       </div>
 
-      <button class="confirm-btn">
+      <button class="confirm-btn" onclick="confirmOrder()">
         <span>✅ Xác nhận đặt hàng</span>
       </button>
       <button class="back-btn" onclick="window.location.href='{{ route('home') }}'">
@@ -244,11 +244,21 @@
     const shippingEl = document.getElementById('shipping');
     const totalEl = document.getElementById('total');
 
-    // Dùng getCart() từ cart.js
+    // Retry getting getCart if not available immediately
+    let attempts = 0;
+    while (typeof getCart !== 'function' && attempts < 10) {
+        console.warn('getCart not found, retrying...');
+        await new Promise(r => setTimeout(r, 200));
+        attempts++;
+    }
+
     if (typeof getCart !== 'function') {
-        console.error('getCart function not found!');
+        console.error('❌ getCart function NOT found after retries. cart.js might not be loaded.');
+        orderItemsDiv.innerHTML = '<p style="text-align:center;color:red;padding:20px">Lỗi: Không thể tải thư viện giỏ hàng. Vui lòng tải lại trang.</p>';
         return;
     }
+
+    console.log('✅ getCart found, fetching data...');
 
     const cartData = await getCart();
 
@@ -374,7 +384,7 @@
                 window.location.href = data.redirectUrl;
             } else {
                 // COD - show success message and redirect to home
-                alert('✅ Đặt hàng thành công! Cám ơn bạn đã ủng hộ.');
+                alert('Đặt hàng thành công! Cám ơn bạn đã ủng hộ.');
                 // Cập nhật lại UI giỏ hàng (về 0)
                 if(window.updateCartCount) window.updateCartCount();
                 window.location.href = '{{ route("home") }}';
@@ -384,8 +394,8 @@
             alert('❌ ' + (data.message || 'Đặt hàng thất bại'));
         }
     } catch (error) {
-        console.error('Order error:', error);
-        alert('❌ Có lỗi xảy ra khi đặt hàng');
+        console.error('Order error DETAILS:', error);
+        alert('❌ Có lỗi xảy ra khi đặt hàng: ' + (error.message || error));
     }
   }
 

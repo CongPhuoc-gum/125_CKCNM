@@ -36,18 +36,26 @@ class OrderController extends Controller
         $order = Order::find($id);
 
         if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
         }
 
-        if ($order->status !== 'pending') {
-            return response()->json(['message' => 'Cannot cancel order that is not pending'], 400);
+        // Chỉ cho phép hủy đơn hàng "pending" hoặc "processing"
+        if (!in_array($order->status, ['pending', 'processing'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể hủy đơn hàng đang giao hoặc đã hoàn thành'
+            ], 400);
         }
 
         $order->status = 'cancelled';
         $order->save();
         
 
-        return response()->json(['message' => 'Order cancelled successfully', 'order' => $order]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Hủy đơn hàng thành công',
+            'order' => $order
+        ]);
     }
 
     public function checkout(Request $request)
@@ -306,14 +314,16 @@ class OrderController extends Controller
             $session = \Stripe\Checkout\Session::retrieve($sessionId);
             
             if ($session->payment_status == 'paid') {
+                 $orderId = null; 
                  
-                 return response()->json(['message' => 'Stripe Payment successful', 'data' => $session]);
+                 
+                 return redirect()->route('home')->with('success', 'Thanh toán Stripe thành công! Cảm ơn bạn đã mua hàng.');
             } else {
-                return response()->json(['message' => 'Stripe Payment failed or unpaid'], 400);
+                return redirect()->route('home')->with('error', 'Thanh toán Stripe thất bại hoặc chưa hoàn tất.');
             }
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Stripe Error', 'error' => $e->getMessage()], 500);
+            return redirect()->route('home')->with('error', 'Lỗi xử lý thanh toán Stripe: ' . $e->getMessage());
         }
     }
 

@@ -1,7 +1,4 @@
-if (!window.API_URL) {
-    window.API_URL = 'http://localhost:8000/api';
-}
-const API_URL = window.API_URL;
+if (!window.API_URL) window.API_URL = '/api';
 
 // ===== HELPER FUNCTIONS =====
 function saveRegisterData(data) {
@@ -29,7 +26,14 @@ async function handleLogin(email, password) {
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json();
+        const contentType = response.headers.get("content-type");
+        let data;
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            throw new Error("Server returned non-JSON response: " + text.substring(0, 100));
+        }
 
         if (response.ok && data.success) {
             // Lưu token và user info
@@ -37,7 +41,7 @@ async function handleLogin(email, password) {
             localStorage.setItem('token_type', 'Bearer');
             localStorage.setItem('user', JSON.stringify(data.data.user));
 
-            alert('✅ Đăng nhập thành công!');
+            alert('Đăng nhập thành công!');
 
             // Kiểm tra role và redirect
             if (data.data.user.role === 'admin') {
@@ -50,7 +54,7 @@ async function handleLogin(email, password) {
         }
     } catch (error) {
         console.error('Login error:', error);
-        alert('❌ Có lỗi xảy ra khi đăng nhập!');
+        alert('❌ Có lỗi xảy ra khi đăng nhập: ' + error.message);
     }
 }
 
@@ -137,7 +141,7 @@ async function handleVerifyOTP(otpCode) {
             // Xóa dữ liệu đăng ký tạm
             clearRegisterData();
 
-            alert('✅ Đăng ký thành công!');
+            alert('Đăng ký thành công!');
 
             setTimeout(() => {
                 window.location.href = '/';
@@ -221,7 +225,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         localStorage.setItem('token', token);
         localStorage.setItem('token_type', 'Bearer');
 
-        // ✅ LẤY THÔNG TIN USER TỪ API
+        // LẤY THÔNG TIN USER TỪ API
         try {
             console.log('🔵 Fetching user info from API...');
 
@@ -238,13 +242,13 @@ window.addEventListener('DOMContentLoaded', async function () {
             console.log('🟢 User info response:', result);
 
             if (result.success && result.data) {
-                // ✅ LƯU THÔNG TIN USER VÀO LOCALSTORAGE
+                //LƯU THÔNG TIN USER VÀO LOCALSTORAGE
                 localStorage.setItem('user', JSON.stringify(result.data));
 
                 console.log('🟢 User info saved to localStorage:', result.data);
 
                 // Hiển thị thông báo thành công
-                alert('✅ Đăng nhập Google thành công!\n\nXin chào, ' + result.data.fullName + '!');
+                alert('Đăng nhập Google thành công!\n\nXin chào, ' + result.data.fullName + '!');
 
                 // Xóa token khỏi URL
                 window.history.replaceState({}, document.title, window.location.pathname);
@@ -302,7 +306,7 @@ async function handleLogout() {
         localStorage.removeItem('cart_items');
         clearRegisterData();
 
-        alert('✅ Đăng xuất thành công!');
+        alert('Đăng xuất thành công!');
         window.location.href = '/login';
 
     } catch (error) {
