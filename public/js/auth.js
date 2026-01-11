@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/api';
+const API_URL = window.location.origin + '/api';
 
 // ===== HELPER FUNCTIONS =====
 function saveRegisterData(data) {
@@ -81,6 +81,8 @@ async function handleRegister(userData) {
             }, 1500);
         } else {
             let errorMsg = data.message || 'Đăng ký thất bại!';
+
+            if (data.errors) {
 
             if (data.errors) {
                 const firstError = Object.values(data.errors)[0];
