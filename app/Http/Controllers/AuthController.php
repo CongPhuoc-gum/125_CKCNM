@@ -115,16 +115,18 @@ class AuthController extends Controller
                 ], 400);
             }
 
-            // Tạo tài khoản
+            // ✅ Tạo tài khoản - RÕ RÀNG SET googleId = null
             $user = User::create([
                 'fullName' => $request->fullName,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
+                'googleId' => null, // ✅ THÊM DÒNG NÀY
                 'isVerified' => true,
                 'role' => 'user',
                 'isActive' => true,
             ]);
+            
             Cart::create([
                 'userId' => $user->userId, 
                 'createdAt' => now()
@@ -348,169 +350,174 @@ class AuthController extends Controller
     }
 
     public function redirectToGoogle()
-{
-    $params = [
-        'client_id' => config('services.google.client_id'),
-        'redirect_uri' => config('services.google.redirect_uri'),
-        'response_type' => 'code',
-        'scope' => 'openid email profile',
-        'access_type' => 'offline',
-        'prompt' => 'consent'
-    ];
+    {
+        $params = [
+            'client_id' => config('services.google.client_id'),
+            'redirect_uri' => config('services.google.redirect_uri'),
+            'response_type' => 'code',
+            'scope' => 'openid email profile',
+            'access_type' => 'offline',
+            'prompt' => 'consent'
+        ];
 
-    $url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
-    
-    return redirect($url);
-}
-
-/**
- * HANDLE GOOGLE CALLBACK
- */
-public function handleGoogleCallback(Request $request)
-{
-    // Debug: In ra tất cả params
-    \Log::info('Google Callback Params:', $request->all());
-    
-    try {
-        $code = $request->get('code');
-        $error = $request->get('error'); // Kiểm tra lỗi từ Google
+        $url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
         
-        // Nếu Google trả về lỗi
-        if ($error) {
-            \Log::error('Google returned error:', ['error' => $error]);
-            return redirect('/login')->with('error', 'Google từ chối: ' . $error);
-        }
+        return redirect($url);
+    }
+
+    /**
+     * HANDLE GOOGLE CALLBACK
+     */
+    public function handleGoogleCallback(Request $request)
+    {
+        // Debug: In ra tất cả params
+        \Log::info('Google Callback Params:', $request->all());
         
-        if (!$code) {
-            \Log::error('No code received from Google');
-            return redirect('/login')->with('error', 'Không nhận được mã xác thực từ Google');
-        }
-
-        \Log::info('Code received:', ['code' => substr($code, 0, 20) . '...']);
-
-        $tokenResponse = $this->getGoogleAccessToken($code);
-        
-        if (!$tokenResponse || !isset($tokenResponse['access_token'])) {
-            \Log::error('Cannot get access token', ['response' => $tokenResponse]);
-            return redirect('/login')->with('error', 'Không thể lấy access token từ Google');
-        }
-
-        \Log::info('Access token received');
-
-        $googleUser = $this->getGoogleUser($tokenResponse['access_token']);
-        
-        if (!$googleUser) {
-            \Log::error('Cannot get user info');
-            return redirect('/login')->with('error', 'Không thể lấy thông tin người dùng');
-        }
-
-        \Log::info('User info:', ['email' => $googleUser['email'], 'name' => $googleUser['name']]);
-
-        // Tìm hoặc tạo user
-        $user = User::where('email', $googleUser['email'])->first();
-
-        if (!$user) {
-            \Log::info('Creating new user');
+        try {
+            $code = $request->get('code');
+            $error = $request->get('error');
             
-            $user = User::create([
-                'fullName' => $googleUser['name'],
-                'email' => $googleUser['email'],
-                'phone' => '',
-                'password' => Hash::make(uniqid()),
-                'googleId' => $googleUser['id'],
-                'role' => 'user',
-                'isVerified' => true,
-                'isActive' => true,
-            ]);
-
-            Cart::create([
-                'userId' => $user->userId,
-                'createdAt' => now()
-            ]);
-            
-            \Log::info('New user created:', ['userId' => $user->userId]);
-        } else {
-            \Log::info('User exists:', ['userId' => $user->userId]);
-            
-            if (!$user->googleId) {
-                $user->update(['googleId' => $googleUser['id']]);
+            if ($error) {
+                \Log::error('Google returned error:', ['error' => $error]);
+                return redirect('/login')->with('error', 'Google từ chối: ' . $error);
             }
+            
+            if (!$code) {
+                \Log::error('No code received from Google');
+                return redirect('/login')->with('error', 'Không nhận được mã xác thực từ Google');
+            }
+
+            \Log::info('Code received:', ['code' => substr($code, 0, 20) . '...']);
+
+            $tokenResponse = $this->getGoogleAccessToken($code);
+            
+            if (!$tokenResponse || !isset($tokenResponse['access_token'])) {
+                \Log::error('Cannot get access token', ['response' => $tokenResponse]);
+                return redirect('/login')->with('error', 'Không thể lấy access token từ Google');
+            }
+
+            \Log::info('Access token received');
+
+            $googleUser = $this->getGoogleUser($tokenResponse['access_token']);
+            
+            if (!$googleUser) {
+                \Log::error('Cannot get user info');
+                return redirect('/login')->with('error', 'Không thể lấy thông tin người dùng');
+            }
+
+            \Log::info('User info:', ['email' => $googleUser['email'], 'name' => $googleUser['name']]);
+
+            // Tìm user theo email
+            $user = User::where('email', $googleUser['email'])->first();
+
+            if (!$user) {
+                // ✅ Tạo user mới từ Google
+                \Log::info('Creating new user from Google');
+                
+                $user = User::create([
+                    'fullName' => $googleUser['name'],
+                    'email' => $googleUser['email'],
+                    'phone' => '',
+                    'password' => Hash::make(uniqid()),
+                    'googleId' => $googleUser['id'], // ✅ Set googleId cho user Google
+                    'role' => 'user',
+                    'isVerified' => true,
+                    'isActive' => true,
+                ]);
+
+                Cart::create([
+                    'userId' => $user->userId,
+                    'createdAt' => now()
+                ]);
+                
+                \Log::info('New user created:', ['userId' => $user->userId]);
+            } else {
+                // ✅ User đã tồn tại - Kiểm tra xem có phải tài khoản Google không
+                \Log::info('User exists:', ['userId' => $user->userId, 'hasGoogleId' => !empty($user->googleId)]);
+                
+                if (!$user->googleId) {
+                    // ❌ Email này đã đăng ký bằng password, KHÔNG cho phép login Google
+                    \Log::warning('User tried to login with Google but account registered with password');
+                    return redirect('/login?error=email_exists_with_password');
+                }
+                
+                // ✅ User đã có googleId rồi → OK, cho phép đăng nhập
+            }
+
+            // Tạo token
+            $token = $user->createToken('auth_token')->plainTextToken;
+            
+            \Log::info('Token created, redirecting...');
+
+            // Redirect về trang chủ
+            return redirect('/?token=' . $token . '&login=success');
+
+        } catch (\Exception $e) {
+            \Log::error('Exception in callback:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect('/login')->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
-
-        // Tạo token
-        $token = $user->createToken('auth_token')->plainTextToken;
-        
-        \Log::info('Token created, redirecting...');
-
-        // Redirect về trang chủ
-        return redirect('/?token=' . $token . '&login=success');
-
-    } catch (\Exception $e) {
-        \Log::error('Exception in callback:', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        
-        return redirect('/login')->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
     }
-}
 
-/**
- * Lấy access token từ Google
- */
-private function getGoogleAccessToken($code)
-{
-    $client = new \GuzzleHttp\Client([
-        'verify' => false // Tắt SSL verification
-    ]);
-    
-    try {
-        \Log::info('Requesting Google access token');
-
-        $response = $client->post('https://oauth2.googleapis.com/token', [
-            'form_params' => [
-                'client_id' => config('services.google.client_id'),
-                'client_secret' => config('services.google.client_secret'),
-                'redirect_uri' => config('services.google.redirect_uri'),
-                'code' => $code,
-                'grant_type' => 'authorization_code'
-            ]
+    /**
+     * Lấy access token từ Google
+     */
+    private function getGoogleAccessToken($code)
+    {
+        $client = new \GuzzleHttp\Client([
+            'verify' => false
         ]);
+        
+        try {
+            \Log::info('Requesting Google access token');
 
-        $result = json_decode($response->getBody(), true);
-        
-        \Log::info('Google access token received');
-        
-        return $result;
-        
-    } catch (\Exception $e) {
-        \Log::error('Google token request exception', [
-            'message' => $e->getMessage()
-        ]);
-        return null;
+            $response = $client->post('https://oauth2.googleapis.com/token', [
+                'form_params' => [
+                    'client_id' => config('services.google.client_id'),
+                    'client_secret' => config('services.google.client_secret'),
+                    'redirect_uri' => config('services.google.redirect_uri'),
+                    'code' => $code,
+                    'grant_type' => 'authorization_code'
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+            
+            \Log::info('Google access token received');
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            \Log::error('Google token request exception', [
+                'message' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
-}
 
-/**
- * Lấy thông tin user từ Google
- */
-private function getGoogleUser($accessToken)
-{
-    $client = new \GuzzleHttp\Client([
-        'verify' => false // Tắt SSL verification
-    ]);
-    
-    try {
-        $response = $client->get('https://www.googleapis.com/oauth2/v2/userinfo', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken
-            ]
+    /**
+     * Lấy thông tin user từ Google
+     */
+    private function getGoogleUser($accessToken)
+    {
+        $client = new \GuzzleHttp\Client([
+            'verify' => false
         ]);
+        
+        try {
+            $response = $client->get('https://www.googleapis.com/oauth2/v2/userinfo', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken
+                ]
+            ]);
 
-        return json_decode($response->getBody(), true);
-    } catch (\Exception $e) {
-        \Log::error('Get Google user error:', ['message' => $e->getMessage()]);
-        return null;
+            return json_decode($response->getBody(), true);
+        } catch (\Exception $e) {
+            \Log::error('Get Google user error:', ['message' => $e->getMessage()]);
+            return null;
+        }
     }
-}
 }
