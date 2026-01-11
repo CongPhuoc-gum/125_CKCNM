@@ -195,17 +195,22 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    padding: 20px;
+    /* Add padding to prevent touching edges */
 }
 
 .modal-content {
     background: white;
     width: 90%;
     max-width: 800px;
-    max-height: 90vh;
+    max-height: 85vh;
+    /* Reduce max height */
     border-radius: 16px;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+    /* Remove overflow:hidden globally to allow header/footer to stay fixed while body scrolls */
 }
 
 /* ===== REVIEW MODAL ===== */
@@ -235,6 +240,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -255,6 +261,230 @@
     .order-total {
         flex-direction: column;
         align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* ===== IMPROVED MODAL STYLES ===== */
+
+/* Section Titles */
+.section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #4a5568;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #edf2f7;
+    margin-top: 5px;
+}
+
+/* Detail Items List */
+.detail-items-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-bottom: 20px;
+}
+
+/* Detail Item Style */
+.detail-item {
+    display: flex;
+    gap: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8fafc;
+    margin-bottom: 10px;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.detail-item:hover {
+    background: #f1f5f9;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 4px 0;
+}
+
+.item-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #718096;
+}
+
+.item-subtotal {
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Reviewed Badge */
+.reviewed-badge {
+    display: inline-block;
+    font-size: 11px;
+    color: #38a169;
+    background: #f0fff4;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 5px;
+    border: 1px solid #c6f6d5;
+}
+
+/* Review Button Small */
+.review-btn-small {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 5px rgba(255, 165, 0, 0.2);
+}
+
+.review-btn-small:hover {
+    transform: translateY(-1px);
+}
+
+/* Grid Layout for Info */
+.detail-row.two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.info-group p {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.info-group strong {
+    color: #718096;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Action Footer */
+.action-footer {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.cancel-order-btn {
+    width: auto;
+    min-width: 200px;
+}
+
+/* Total Bar */
+.detail-total-bar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 0 0 16px 16px;
+    margin: 20px -20px -20px -20px;
+    /* pull to edges */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+}
+
+.detail-total-bar strong {
+    font-size: 24px;
+}
+
+/* Modal Content Adjustment */
+#modal-body {
+    padding: 20px 20px 0 20px;
+    overflow-y: auto;
+    /* Scroll ONLY the body */
+    flex: 1;
+    /* Take remaining space */
+    min-height: 0;
+    /* Necessary for flex scroll */
+}
+
+/* Header Styles */
+.modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Improve close button positioning */
+.modal-close {
+    background: #f1f5f9;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #64748b;
+    border: none;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #ffe4e6;
+    color: #e11d48;
+}
+
+/* Fix header z-index/position if needed, though structure usually puts header first */
+.modal-content h3 {
+    /* Remove old rule to avoid conflict */
+    display: none;
+}
+
+/* Reset h3 display inside header which is specific */
+.modal-header h3 {
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .detail-row.two-cols {
+        grid-template-columns: 1fr;
         gap: 10px;
     }
 }

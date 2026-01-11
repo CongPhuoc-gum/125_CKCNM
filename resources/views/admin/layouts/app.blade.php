@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ✅ THÊM DÒNG NÀY - QUAN TRỌNG -->
+    <!-- THÊM DÒNG NÀY - QUAN TRỌNG -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <title>@yield('title', 'Admin Panel') - Snack Shop</title>
