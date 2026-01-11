@@ -28,16 +28,6 @@
 }
 
 .checkout-box h3 {
-  margin-bottom: 20px;
-  color: #2f7d32;
-  font-size: 18px;
-  font-weight: 700;
-  border-bottom: 2px solid #e8f5e9;
-  padding-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.checkout-box h3 {
   margin-bottom: 18px;
   color: #2f7d32;
   font-size: 20px;
@@ -47,12 +37,6 @@
 .checkout-box input,
 .checkout-box textarea {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  transition: all 0.3s;
   padding: 12px 14px;
   margin-bottom: 14px;
   border-radius: 8px;
@@ -64,8 +48,6 @@
 
 .checkout-box input:focus,
 .checkout-box textarea:focus {
-  border-color: #2f7d32;
-  outline: none;
   outline: none;
   border-color: #2f7d32;
   box-shadow: 0 0 0 3px rgba(47, 125, 50, 0.1);
@@ -77,100 +59,6 @@
 }
 
 /* --- PAYMENT METHODS STYLE --- */
-.payment-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.payment-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #fff;
-}
-
-.payment-card:hover {
-  border-color: #a5d6a7;
-  background-color: #f1f8e9;
-}
-
-/* Hide default radio input */
-.payment-card input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* Selected state */
-.payment-card:has(input:checked) {
-  border-color: #2f7d32;
-  background-color: #e8f5e9;
-  box-shadow: 0 4px 12px rgba(47, 125, 50, 0.15);
-}
-
-.card-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-}
-
-.payment-logo {
-  height: 35px;
-  width: auto;
-  object-fit: contain;
-}
-
-.icon-box {
-  width: 40px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  background: #eee;
-  border-radius: 5px;
-}
-
-.payment-card span {
-  font-weight: 600;
-  font-size: 15px;
-  color: #333;
-}
-
-/* Checkmark indicator */
-.payment-card::after {
-  content: '';
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ddd;
-  border-radius: 50%;
-  margin-left: auto;
-  transition: all 0.2s;
-}
-
-.payment-card:has(input:checked)::after {
-  border-color: #2f7d32;
-  background-color: #2f7d32;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
-}
-
-/* --- SUMMARY --- */
-.summary {
-  height: fit-content;
-  position: sticky;
-  top: 90px;
-  min-height: 90px;
-}
-
-/* Phương thức thanh toán - Làm mới hoàn toàn */
 .pay-option {
   display: flex;
   align-items: center;
@@ -226,7 +114,7 @@
 .summary {
   height: fit-content;
   position: sticky;
-  top: 20px;
+  top: 90px;
 }
 
 #order-items {
@@ -260,45 +148,85 @@
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #eee;
+  flex-shrink: 0;
 }
 
-.order-item-info {
+.order-info {
   flex: 1;
+  min-width: 0;
 }
 
-.order-item-name {
+.order-name {
   font-weight: 600;
   font-size: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-btn {
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid #2f7d32;
+  background: white;
+  color: #2f7d32;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.qty-btn:hover {
+  background: #2f7d32;
+  color: white;
+  transform: scale(1.1);
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
+}
+
+.qty-display {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
   color: #333;
 }
 
-.order-item-detail {
-  color: #666;
-  font-size: 13px;
-}
-
-.order-item-price {
+.order-price {
   font-weight: 700;
   color: #e63e20;
   font-size: 15px;
+  flex-shrink: 0;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
-  color: #555;
   margin-bottom: 12px;
   padding: 8px 0;
   font-size: 15px;
+  color: #555;
 }
 
 .summary-row.total {
   font-size: 20px;
   color: #2f7d32;
-  font-weight: 800;
-  border-top: 1px dashed #ddd;
   font-weight: 700;
   border-top: 2px solid #e0e0e0;
   padding-top: 15px;
@@ -308,7 +236,6 @@
 /* Buttons */
 .confirm-btn {
   width: 100%;
-  padding: 15px;
   padding: 14px;
   background: linear-gradient(135deg, #2f7d32 0%, #1b5e20 100%);
   color: #fff;
@@ -317,14 +244,6 @@
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 20px;
-  box-shadow: 0 4px 6px rgba(47, 125, 50, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.confirm-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(47, 125, 50, 0.4);
   margin-top: 15px;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(47, 125, 50, 0.3);
@@ -342,27 +261,15 @@
 
 .back-btn {
   width: 100%;
-  margin-top: 15px;
-  padding: 12px;
-  background: #f5f5f5;
-  color: #666;
-  border: none;
   margin-top: 10px;
   padding: 12px;
   background: #f5f5f5;
   border: 1.5px solid #ddd;
   border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.back-btn:hover {
-  background: #e0e0e0;
-  color: #333;
   font-size: 15px;
   font-weight: 600;
   color: #666;
+  cursor: pointer;
   transition: all 0.3s;
 }
 

@@ -31,6 +31,36 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
+    /**
+     * Khách hàng xác nhận đã nhận hàng
+     * PUT /api/orders/{id}/complete
+     */
+    public function complete($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy đơn hàng'], 404);
+        }
+
+        // Chỉ cho phép xác nhận khi đơn đang giao
+        if ($order->status !== 'shipping') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Chỉ có thể xác nhận đơn hàng đang giao'
+            ], 400);
+        }
+
+        $order->status = 'completed';
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xác nhận nhận hàng thành công',
+            'order' => $order
+        ]);
+    }
+
     public function cancel($id)
     {
         $order = Order::find($id);
@@ -49,7 +79,6 @@ class OrderController extends Controller
 
         $order->status = 'cancelled';
         $order->save();
-        
 
         return response()->json([
             'success' => true,
@@ -74,7 +103,7 @@ class OrderController extends Controller
         try {
             
             $order = Order::create([
-                'userId' => $request->userId, // Có thể lấy Auth::id() nếu đã login
+                'userId' => $request->userId,
                 'totalAmount' => $request->totalAmount,
                 'status' => 'pending',
                 'customerName' => $request->customerName,
@@ -83,7 +112,6 @@ class OrderController extends Controller
                 'note' => $request->note,
             ]);
 
-            
             foreach ($request->cartItems as $item) {
                 OrderItem::create([
                     'orderId' => $order->orderId,
@@ -93,7 +121,6 @@ class OrderController extends Controller
                 ]);
             }
 
-            
             if ($request->paymentMethod === 'cod') {
                 Payment::create([
                     'orderId' => $order->orderId,
@@ -102,7 +129,7 @@ class OrderController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Clear user's cart after successful order
+                // Clear user's cart
                 if ($request->userId) {
                     $cart = DB::table('carts')->where('userId', $request->userId)->first();
                     if ($cart) {
@@ -120,7 +147,7 @@ class OrderController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Clear user's cart after successful order
+                // Clear user's cart
                 if ($request->userId) {
                     $cart = DB::table('carts')->where('userId', $request->userId)->first();
                     if ($cart) {
@@ -129,8 +156,6 @@ class OrderController extends Controller
                 }
 
                 DB::commit();
-
-                
                 $vnpUrl = $this->createVnpayUrl($order);
                 return response()->json(['success' => true, 'message' => 'Redirect to VNPAY', 'redirectUrl' => $vnpUrl], 200);
             } elseif ($request->paymentMethod === 'stripe') {
@@ -141,7 +166,7 @@ class OrderController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Clear user's cart after successful order
+                // Clear user's cart
                 if ($request->userId) {
                     $cart = DB::table('carts')->where('userId', $request->userId)->first();
                     if ($cart) {
@@ -151,12 +176,10 @@ class OrderController extends Controller
 
                 DB::commit();
 
-                // Stripe Checkout
                 \Stripe\Stripe::setApiKey(config('stripe.sk'));
                 
                 $lineItems = [];
                 foreach ($request->cartItems as $item) {
-                     
                      $lineItems[] = [
                         'price_data' => [
                             'currency' => 'vnd',
@@ -174,12 +197,11 @@ class OrderController extends Controller
                     'line_items' => $lineItems,
                     'mode' => 'payment',
                     'success_url' => url('/api/stripe-return?session_id={CHECKOUT_SESSION_ID}'),
-                    'cancel_url' => url('/api/checkout-cancel'), // Tạm
+                    'cancel_url' => url('/api/checkout-cancel'),
                 ]);
 
                 return response()->json(['success' => true, 'message' => 'Redirect to Stripe', 'redirectUrl' => $session->url], 200);
             }
-
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -238,7 +260,7 @@ class OrderController extends Controller
 
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
-            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+            $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
 
@@ -273,7 +295,6 @@ class OrderController extends Controller
 
         if ($secureHash == $vnp_SecureHash) {
             if ($request->vnp_ResponseCode == '00') {
-                // Thanh cong
                 $orderId = $request->vnp_TxnRef;
                 $payment = Payment::where('orderId', $orderId)->first();
                 if ($payment) {
@@ -289,9 +310,8 @@ class OrderController extends Controller
                 }
                 return redirect()->route('home')->with('success', 'Thanh toán VNPay thành công! Đơn hàng của bạn đang được xử lý.');
             } else {
-                // That bai
-                 $orderId = $request->vnp_TxnRef;
-                 Payment::where('orderId', $orderId)->update(['status' => 'failed']);
+                $orderId = $request->vnp_TxnRef;
+                Payment::where('orderId', $orderId)->update(['status' => 'failed']);
                 return redirect()->route('home')->with('error', 'Thanh toán VNPay thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.');
             }
         } else {
@@ -299,13 +319,11 @@ class OrderController extends Controller
         }
     }
 
-    
-    
     public function stripeReturn(Request $request)
     {
         $sessionId = $request->session_id;
         if (!$sessionId) {
-             return response()->json(['message' => 'Missing session_id'], 400);
+            return response()->json(['message' => 'Missing session_id'], 400);
         }
 
         \Stripe\Stripe::setApiKey(config('stripe.sk'));
@@ -314,10 +332,7 @@ class OrderController extends Controller
             $session = \Stripe\Checkout\Session::retrieve($sessionId);
             
             if ($session->payment_status == 'paid') {
-                 $orderId = null; 
-                 
-                 
-                 return redirect()->route('home')->with('success', 'Thanh toán Stripe thành công! Cảm ơn bạn đã mua hàng.');
+                return redirect()->route('home')->with('success', 'Thanh toán Stripe thành công! Cảm ơn bạn đã mua hàng.');
             } else {
                 return redirect()->route('home')->with('error', 'Thanh toán Stripe thất bại hoặc chưa hoàn tất.');
             }
@@ -327,94 +342,81 @@ class OrderController extends Controller
         }
     }
 
-    /**
- * Lấy TẤT CẢ đơn hàng (Admin only)
- * GET /api/admin/orders
- */
-public function adminIndex(Request $request)
-{
-    $query = Order::with(['user:userId,fullName,email', 'items.product:productId,name,imageUrl']);
-
-    // Lọc theo trạng thái
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    // Tìm kiếm theo tên khách hàng
-    if ($request->filled('search')) {
-        $query->where('customerName', 'like', '%' . $request->search . '%')
-            ->orWhere('phone', 'like', '%' . $request->search . '%');
-    }
-
-    // Lọc theo ngày
-    if ($request->filled('from_date')) {
-        $query->whereDate('createdAt', '>=', $request->from_date);
-    }
-    if ($request->filled('to_date')) {
-        $query->whereDate('createdAt', '<=', $request->to_date);
-    }
-
-    $orders = $query->orderBy('createdAt', 'desc')->paginate(15);
-
-    return response()->json([
-        'success' => true,
-        'data' => $orders
-    ]);
-}
-
-/**
- * Cập nhật trạng thái đơn hàng (Admin only)
- * PUT /api/admin/orders/{id}/status
- */
-public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:pending,processing,shipping,completed,cancelled'
-    ]);
-
-    $order = Order::findOrFail($id);
+    // ===== ADMIN FUNCTIONS =====
     
-    if (in_array($order->status, ['cancelled', 'completed'])) {
+    public function adminIndex(Request $request)
+    {
+        $query = Order::with(['user:userId,fullName,email', 'items.product:productId,name,imageUrl']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('customerName', 'like', '%' . $request->search . '%')
+                ->orWhere('phone', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('createdAt', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('createdAt', '<=', $request->to_date);
+        }
+
+        $orders = $query->orderBy('createdAt', 'desc')->paginate(15);
+
         return response()->json([
-            'success' => false,
-            'message' => 'Không thể cập nhật đơn hàng đã ' . ($order->status === 'cancelled' ? 'hủy' : 'hoàn thành')
-        ], 400);
+            'success' => true,
+            'data' => $orders
+        ]);
     }
 
-    $order->status = $request->status;
-    $order->save();
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipping,completed,cancelled'
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Cập nhật trạng thái thành công',
-        'data' => $order->load('items.product')
-    ]);
-}
+        $order = Order::findOrFail($id);
+        
+        if (in_array($order->status, ['cancelled', 'completed'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể cập nhật đơn hàng đã ' . ($order->status === 'cancelled' ? 'hủy' : 'hoàn thành')
+            ], 400);
+        }
 
-/**
- * Thống kê đơn hàng
- * GET /api/admin/orders/statistics
- */
-public function statistics(Request $request)
-{
-    $fromDate = $request->input('from_date', now()->subMonth());
-    $toDate = $request->input('to_date', now());
+        $order->status = $request->status;
+        $order->save();
 
-    $stats = [
-        'total_orders' => Order::whereBetween('createdAt', [$fromDate, $toDate])->count(),
-        'pending' => Order::where('status', 'pending')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-        'processing' => Order::where('status', 'processing')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-        'shipping' => Order::where('status', 'shipping')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-        'completed' => Order::where('status', 'completed')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-        'cancelled' => Order::where('status', 'cancelled')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-        'total_revenue' => Order::whereIn('status', ['completed', 'processing', 'shipping'])
-            ->whereBetween('createdAt', [$fromDate, $toDate])
-            ->sum('totalAmount'),
-    ];
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái thành công',
+            'data' => $order->load('items.product')
+        ]);
+    }
 
-    return response()->json([
-        'success' => true,
-        'data' => $stats
-    ]);
-}
+    public function statistics(Request $request)
+    {
+        $fromDate = $request->input('from_date', now()->subMonth());
+        $toDate = $request->input('to_date', now());
+
+        $stats = [
+            'total_orders' => Order::whereBetween('createdAt', [$fromDate, $toDate])->count(),
+            'pending' => Order::where('status', 'pending')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+            'processing' => Order::where('status', 'processing')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+            'shipping' => Order::where('status', 'shipping')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+            'completed' => Order::where('status', 'completed')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+            'cancelled' => Order::where('status', 'cancelled')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+            'total_revenue' => Order::whereIn('status', ['completed', 'processing', 'shipping'])
+                ->whereBetween('createdAt', [$fromDate, $toDate])
+                ->sum('totalAmount'),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $stats
+        ]);
+    }
 }
