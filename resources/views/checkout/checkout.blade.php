@@ -27,9 +27,8 @@
       Danh Mục <span class="arrow">▼</span>
     </button>
     <div id="dropdown-menu" class="dropdown-menu">
-      <a href="{{ route('home') }}#products" class="menu-item">🔥 Bán Chạy</a>
-      <a href="{{ route('home') }}#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
-      <a href="{{ route('home') }}#contact" class="menu-item">📞 Liên Hệ</a>
+      <a href="{{ route('home') }}" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+      <!-- Categories will be inserted here dynamically -->
     </div>
   </div>
 
@@ -158,6 +157,7 @@
 <script src="{{ asset('js/auth.js') }}"></script>
 <script src="{{ asset('js/cart.js') }}"></script>
 <script src="{{ asset('js/header.js') }}"></script>
+<script src="{{ asset('js/categories.js') }}"></script>
 <script src="{{ asset('js/checkout.js') }}"></script>
 
 </body>

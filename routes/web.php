@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,13 +38,10 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
     return view('home.home', ['products' => $products]);
 })->name('home');
 
-Route::get('/product/{id}', function ($id) {
-    $product = \App\Models\Product::with(['category', 'reviews.user'])->find($id);
-    if (!$product) {
-        abort(404, 'Sản phẩm không tồn tại');
-    }
-    return view('product.product', ['product' => $product]);
-})->name('product.show');
+// ===== PRODUCT DETAIL PAGE với Related Products =====
+Route::get('/product/{id}', [ProductController::class, 'showPage'])
+    ->name('product.show')
+    ->where('id', '[0-9]+');
 
 Route::get('/checkout', function () {
     return view('checkout.checkout');
