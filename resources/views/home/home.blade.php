@@ -8,6 +8,58 @@
 </head>
 <body>
 
+  <script>
+    // ===== HANDLE GOOGLE CALLBACK TOKEN =====
+    async function handleGoogleCallbackToken() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const loginSuccess = urlParams.get('login');
+      
+      if (token && loginSuccess === 'success') {
+        try {
+          // Lưu token vào localStorage
+          localStorage.setItem('token', token);
+          localStorage.setItem('token_type', 'Bearer');
+          
+          // Lấy user info từ API
+          const response = await fetch('/api/auth/me', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data) {
+              // Lưu user info
+              localStorage.setItem('user', JSON.stringify(data.data));
+              console.log('✅ Token từ Google đã được lưu và user info được tải');
+            }
+          } else {
+            console.error('❌ Không thể lấy user info:', response.status);
+            // Xóa token nếu invalid
+            localStorage.removeItem('token');
+            localStorage.removeItem('token_type');
+          }
+        } catch (error) {
+          console.error('❌ Lỗi khi xử lý Google callback:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('token_type');
+        }
+        
+        // Xóa token khỏi URL để clean
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Reload page để hiển thị user info
+        setTimeout(() => location.reload(), 500);
+      }
+    }
+    
+    window.addEventListener('DOMContentLoaded', handleGoogleCallbackToken);
+  </script>
+
   @if(session('success'))
     <script>
       document.addEventListener('DOMContentLoaded', async () => {
