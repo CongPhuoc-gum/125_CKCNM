@@ -260,6 +260,16 @@ if (!window.API_URL) window.API_URL = '/api';
 
     // ===== COMPLETE CHECKOUT =====
     async function completeCheckout(paymentMethod, cartItems, totalAmount, info) {
+        const btn = document.querySelector('.confirm-btn');
+        const originalText = btn ? btn.textContent : '✅ Xác nhận đặt hàng';
+
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Đang xử lý...';
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+        }
+
         try {
             const res = await fetch(`${API_URL}/checkout`, {
                 method: 'POST',
@@ -282,22 +292,39 @@ if (!window.API_URL) window.API_URL = '/api';
             const result = await res.json();
 
             if (res.ok && result.success) {
-                // Check if payment gateway redirect is required
-                if (result.redirectUrl) {
-                    // For VNPay or Stripe - redirect to payment gateway
-                    console.log('Redirecting to payment gateway:', result.redirectUrl);
-                    window.location.href = result.redirectUrl;
-                } else {
-                    // For COD - show success and redirect to orders page
+                if (paymentMethod === 'cod') {
+                    // COD: Show success and redirect
                     showToast('Đặt hàng thành công!', 'success');
                     setTimeout(() => window.location.href = '/orders', 1500);
+                } else {
+                    // VNPay or Stripe: Expect redirectUrl
+                    if (result.redirectUrl) {
+                        console.log('Redirecting to payment gateway:', result.redirectUrl);
+                        window.location.href = result.redirectUrl;
+                        // Do not re-enable button
+                    } else {
+                        console.error('Missing redirectUrl for ' + paymentMethod, result);
+                        showToast('Lỗi: Không nhận được liên kết thanh toán. Vui lòng thử lại.', 'error');
+                        resetButton(btn, originalText);
+                    }
                 }
             } else {
                 showToast(result.message || 'Đặt hàng thất bại!', 'error');
+                resetButton(btn, originalText);
             }
         } catch (e) {
             console.error('Checkout error:', e);
             showToast('Lỗi hệ thống!', 'error');
+            resetButton(btn, originalText);
+        }
+    }
+
+    function resetButton(btn, text) {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = text;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
         }
     }
 

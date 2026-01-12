@@ -308,14 +308,14 @@ class OrderController extends Controller
                         $order->save();
                     }
                 }
-                return redirect()->route('home')->with('success', 'Thanh toán VNPay thành công! Đơn hàng của bạn đang được xử lý.');
+                return redirect('/orders')->with('success', 'Thanh toán VNPay thành công! Đơn hàng của bạn đang được xử lý.');
             } else {
                 $orderId = $request->vnp_TxnRef;
                 Payment::where('orderId', $orderId)->update(['status' => 'failed']);
-                return redirect()->route('home')->with('error', 'Thanh toán VNPay thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.');
+                return redirect('/orders')->with('error', 'Thanh toán VNPay thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.');
             }
         } else {
-            return redirect()->route('home')->with('error', 'Giao dịch không hợp lệ.');
+            return redirect('/orders')->with('error', 'Giao dịch không hợp lệ.');
         }
     }
 
@@ -332,13 +332,13 @@ class OrderController extends Controller
             $session = \Stripe\Checkout\Session::retrieve($sessionId);
             
             if ($session->payment_status == 'paid') {
-                return redirect()->route('home')->with('success', 'Thanh toán Stripe thành công! Cảm ơn bạn đã mua hàng.');
+                return redirect('/orders')->with('success', 'Thanh toán Stripe thành công! Cảm ơn bạn đã mua hàng.');
             } else {
-                return redirect()->route('home')->with('error', 'Thanh toán Stripe thất bại hoặc chưa hoàn tất.');
+                return redirect('/orders')->with('error', 'Thanh toán Stripe thất bại hoặc chưa hoàn tất.');
             }
 
         } catch (\Exception $e) {
-            return redirect()->route('home')->with('error', 'Lỗi xử lý thanh toán Stripe: ' . $e->getMessage());
+            return redirect('/orders')->with('error', 'Lỗi xử lý thanh toán Stripe: ' . $e->getMessage());
         }
     }
 

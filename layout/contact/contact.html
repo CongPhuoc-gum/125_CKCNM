@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Liên hệ | SnackFood</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+
+<div class="site">
+
+  <!-- CSS dùng chung với HOME -->
+  <link rel="stylesheet" href="../home/styles.css">
+  <!-- CSS riêng cho checkout -->
+  <link rel="stylesheet" href="contact.css">
+</head>
+<body>
+
+<div class="site">
+
+<header>
+  <a class="brand" href="../home/home.html">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoV0_K78ROk_yDSrCyKON-JkXA5uWF9gxe4A&s" alt="SnackFood">
+    <div>
+      <h1>SnackFood</h1>
+      <div>Shop chuyên bán đồ khô</div>
+    </div>
+  </a>
+
+  <div class="menu-wrapper">
+    <button id="menu-toggle">
+      Danh Mục <span class="arrow">▼</span>
+    </button>
+    <div id="dropdown-menu" class="dropdown-menu">
+      <a href="../home/home.html#products" class="menu-item">🔥 Bán Chạy</a>
+      <a href="../home/home.html#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+      <a href="#" class="menu-item">🦑 Mực Khô</a>
+      <a href="#" class="menu-item">🐟 Cá Khô</a>
+      <a href="#" class="menu-item">🥜 Hạt & Snack</a>
+      <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
+      <a href="../home/home.html#contact" class="menu-item">📞 Liên Hệ</a>
+    </div>
+  </div>
+
+  <div class="search" role="search">
+    <input type="search" placeholder="Tìm kiếm sản phẩm...">
+    <button>🔎</button>
+  </div>
+
+  <button id="cart-btn">
+    🛒 <span id="cart-count">0</span>
+  </button>
+
+  <div id="user-area"></div>
+</header>
+
+<div id="dropdown-overlay"></div>
+
+<!-- ===== CONTENT ===== -->
+<main class="contact-page">
+
+  <h2>📞 Liên hệ với chúng tôi</h2>
+
+  <div class="contact-container">
+
+    <!-- FORM LIÊN HỆ -->
+    <section class="contact-box">
+      <h3>Gửi tin nhắn</h3>
+      <input type="text" placeholder="Họ và tên">
+      <input type="email" placeholder="Email">
+      <textarea placeholder="Nội dung liên hệ"></textarea>
+      <button id="sendBtn">Gửi liên hệ</button>
+    </section>
+
+    <!-- THÔNG TIN SHOP -->
+    <section class="contact-info">
+      <h3>Thông tin cửa hàng</h3>
+      <p>🏪 <strong>SnackFood</strong></p>
+      <p>📍 Địa chỉ: 48 Cao Thắng, Hải Châu, Đà Nẵng</p>
+      <p>📞 Hotline: 0911469675</p>
+      <p>✉️ Email: snackfood@gmail.com</p>
+
+      <div class="map">
+        <iframe 
+            src="https://www.google.com/maps?q=48%20Cao%20Thang,%20Da%20Nang&output=embed"
+            loading="lazy">
+      </iframe>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+</div>
+
+<!-- ===== SCRIPT ===== -->
+<script>
+/* DROPDOWN MENU */
+const toggleBtn = document.getElementById("menu-toggle");
+const dropdown = document.getElementById("dropdown-menu");
+const overlay = document.getElementById("dropdown-overlay");
+
+toggleBtn.onclick = e => {
+  e.stopPropagation();
+  dropdown.classList.toggle("show");
+  overlay.classList.toggle("show");
+};
+overlay.onclick = () => dropdown.classList.remove("show");
+
+/* LOGIN CHECK */
+(function(){
+  const userArea = document.getElementById("user-area");
+  const user = localStorage.getItem("snack_username");
+
+  if(!user){
+    userArea.innerHTML = `<a href="../login/login.html">Đăng nhập</a>`;
+    return;
+  }
+
+  userArea.innerHTML = `
+    Xin chào, ${user}
+    <button id="logoutBtn">Đăng xuất</button>
+  `;
+
+  document.getElementById("logoutBtn").onclick = () => {
+    localStorage.removeItem("snack_username");
+    location.reload();
+  };
+})();
+
+/* SUBMIT FORM (MOCK) */
+document.getElementById("sendBtn").onclick = () => {
+  alert("Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm.");
+};
+</script>
+
+</body>
+</html>
