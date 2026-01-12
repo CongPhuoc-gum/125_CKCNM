@@ -34,7 +34,7 @@
             attempts++;
         }
         if (typeof showToast === 'function') {
-            alert('❌ {{ session('error') }}'); // Errors might be better as alerts or specific error toasts
+            alert('❌ {{ session('error') }}');
         } else {
             alert('❌ {{ session('error') }}');
         }
@@ -57,10 +57,8 @@
           Danh Mục <span class="arrow">▼</span>
         </button>
         <div id="dropdown-menu" class="dropdown-menu">
-          <a href="#products" class="menu-item">🔥 Bán Chạy</a>
           <a href="{{ route('home') }}" class="menu-item">📦 Tất Cả Sản Phẩm</a>
           <!-- Categories will be inserted here dynamically -->
-          <a href="#contact" class="menu-item">📞 Liên Hệ</a>
         </div>
       </div>
       
@@ -183,7 +181,6 @@
   <script defer src="{{ asset('js/auth.js') }}"></script>
   <script defer src="{{ asset('js/header.js') }}"></script>
   <script defer src="{{ asset('js/categories.js') }}"></script>
-  <script defer src="{{ asset('js/cart.js') }}"></script>
 
 </body>
 </html>

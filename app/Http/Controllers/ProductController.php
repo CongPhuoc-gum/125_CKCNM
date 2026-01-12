@@ -60,7 +60,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (API JSON response)
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -74,6 +74,45 @@ class ProductController extends Controller
         }
 
         return response()->json($product);
+    }
+
+    /**
+     * Display the product detail page (Web View)
+     * Với sản phẩm liên quan
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
+    public function showPage($id)
+    {
+        // Lấy sản phẩm hiện tại với relations
+        $product = Product::with(['category', 'reviews.user'])
+            ->where('productId', $id)
+            ->firstOrFail();
+
+        // Lấy 8 sản phẩm liên quan (cùng danh mục, khác sản phẩm hiện tại)
+        $relatedProducts = Product::where('categoryId', $product->categoryId)
+            ->where('productId', '!=', $product->productId)
+            ->where('status', 1) // Chỉ lấy sản phẩm còn hàng
+            ->inRandomOrder()
+            ->limit(8)
+            ->get();
+
+        // Nếu không đủ 8 sản phẩm cùng danh mục, lấy thêm từ danh mục khác
+        if ($relatedProducts->count() < 8) {
+            $remaining = 8 - $relatedProducts->count();
+            
+            $additionalProducts = Product::where('productId', '!=', $product->productId)
+                ->where('categoryId', '!=', $product->categoryId)
+                ->where('status', 1)
+                ->inRandomOrder()
+                ->limit($remaining)
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($additionalProducts);
+        }
+
+        return view('product.product', compact('product', 'relatedProducts'));
     }
 
     /**
@@ -197,56 +236,62 @@ class ProductController extends Controller
         }
     }
 
-/**
- * Remove the specified resource from storage.
- *
- * @param  int  $id
- * @return \Illuminate\Http\Response
- */
-public function destroy($id)
-{
-    $product = Product::find($id);
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $product = Product::find($id);
 
-    if (!$product) {
-        return response()->json(['message' => 'Product not found'], 404);
-    }
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
 
-    try {
-        // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
-        if ($product->orderitems()->count() > 0) {
+        try {
+            // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
+            if ($product->orderitems()->count() > 0) {
+                return response()->json([
+                    'message' => 'Không thể xóa sản phẩm này vì đã có trong đơn hàng. Bạn có thể ẩn sản phẩm thay vì xóa.'
+                ], 400);
+            }
+
+            // Xóa reviews của sản phẩm
+            $product->reviews()->delete();
+            
+            // Xóa cart items chứa sản phẩm này
+            $product->cartitems()->delete();
+
+            // Xóa ảnh nếu có
+            if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
+                Storage::disk('public')->delete($product->imageUrl);
+                Log::info('Image deleted: ' . $product->imageUrl);
+            }
+
+            // Xóa sản phẩm
+            $product->delete();
+
+            return response()->json(['message' => 'Product deleted successfully'], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Product deletion failed: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
             return response()->json([
-                'message' => 'Không thể xóa sản phẩm này vì đã có trong đơn hàng. Bạn có thể ẩn sản phẩm thay vì xóa.'
-            ], 400);
+                'message' => 'Có lỗi xảy ra khi xóa sản phẩm',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Xóa reviews của sản phẩm
-        $product->reviews()->delete();
-        
-        // Xóa cart items chứa sản phẩm này
-        $product->cartitems()->delete();
-
-        // Xóa ảnh nếu có
-        if ($product->imageUrl && Storage::disk('public')->exists($product->imageUrl)) {
-            Storage::disk('public')->delete($product->imageUrl);
-            Log::info('Image deleted: ' . $product->imageUrl);
-        }
-
-        // Xóa sản phẩm
-        $product->delete();
-
-        return response()->json(['message' => 'Product deleted successfully'], 200);
-
-    } catch (\Exception $e) {
-        Log::error('Product deletion failed: ' . $e->getMessage());
-        Log::error('Stack trace: ' . $e->getTraceAsString()); // Thêm log chi tiết
-        
-        return response()->json([
-            'message' => 'Có lỗi xảy ra khi xóa sản phẩm',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
+    /**
+     * Get best selling products
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function bestSelling(Request $request)
     {
         $limit = $request->get('limit', 10);

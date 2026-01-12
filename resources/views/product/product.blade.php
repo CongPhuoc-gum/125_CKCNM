@@ -23,13 +23,8 @@
       Danh Mục <span class="arrow">▼</span>
     </button>
     <div id="dropdown-menu" class="dropdown-menu">
-      <a href="{{ route('home') }}#products" class="menu-item">🔥 Bán Chạy</a>
-      <a href="{{ route('home') }}#best" class="menu-item">📦 Tất Cả Sản Phẩm</a>
-      <a href="#" class="menu-item">🦑 Mực Khô</a>
-      <a href="#" class="menu-item">🐟 Cá Khô</a>
-      <a href="#" class="menu-item">🥜 Hạt & Snack</a>
-      <a href="#" class="menu-item">🍊 Trái Cây Sấy</a>
-      <a href="{{ route('home') }}#contact" class="menu-item">📞 Liên Hệ</a>
+      <a href="{{ route('home') }}" class="menu-item">📦 Tất Cả Sản Phẩm</a>
+      <!-- Categories will be inserted here dynamically -->
     </div>
   </div>
   
@@ -123,15 +118,15 @@
     </div>
   </div>
    
-  <!-- REVIEWS -->
+  <!-- REVIEWS - HIỂN THỊ TÊN NGƯỜI DÙNG -->
   <div class="review-section">
-    <h2>Đánh giá của khách hàng</h2>
+    <h2>💬 Đánh giá của khách hàng</h2>
 
     @if($product->reviews && count($product->reviews) > 0)
       @foreach($product->reviews as $review)
         <div class="review-item">
           <div class="review-header">
-            <strong>{{ $review->user->name ?? 'Ẩn danh' }}</strong>
+            <strong>{{ $review->user->name ?? 'Khách hàng' }}</strong>
             <span class="stars">
               @for($i = 0; $i < 5; $i++)
                 @if($i < $review->rating)★@else☆@endif
@@ -139,11 +134,47 @@
             </span>
           </div>
           <p>{{ $review->comment ?? 'Không có nhận xét' }}</p>
-          <small style="color:#999">{{ $review->createdAt->format('d/m/Y H:i') ?? '' }}</small>
+          <small style="color:#999">{{ $review->createdAt ? $review->createdAt->format('d/m/Y H:i') : '' }}</small>
         </div>
       @endforeach
     @else
-      <p style="text-align:center;color:#999;padding:20px">Chưa có đánh giá nào</p>
+      <p style="text-align:center;color:#999;padding:20px">Chưa có đánh giá nào cho sản phẩm này</p>
+    @endif
+  </div>
+
+  <!-- ===== RELATED PRODUCTS SECTION - SIMPLE GRID ===== -->
+  <div class="related-products-section">
+    <h2>🔥 Sản phẩm liên quan</h2>
+    
+    @if(isset($relatedProducts) && count($relatedProducts) > 0)
+      <!-- Products Grid (2 rows x 4 cols = 8 products max) -->
+      <div class="related-products-grid">
+        @foreach($relatedProducts->take(8) as $relatedProduct)
+          <a href="{{ route('product.show', $relatedProduct->productId) }}" class="related-product-card">
+            <div class="related-product-image {{ !$relatedProduct->imageUrl ? 'no-img' : '' }}">
+              @if($relatedProduct->imageUrl)
+                <img src="{{ asset('storage/' . $relatedProduct->imageUrl) }}" 
+                     alt="{{ $relatedProduct->name }}"
+                     onerror="this.parentElement.classList.add('no-img'); this.innerHTML='{{ $relatedProduct->name }}';">
+              @else
+                {{ $relatedProduct->name }}
+              @endif
+            </div>
+            
+            <div class="related-product-info">
+              <div class="related-product-name">{{ $relatedProduct->name }}</div>
+              <div class="related-product-price">{{ number_format($relatedProduct->price, 0, ',', '.') }}₫</div>
+              <div class="related-product-stock {{ $relatedProduct->status == 1 ? 'in-stock' : 'out-stock' }}">
+                {{ $relatedProduct->status == 1 ? '✓ Còn hàng' : '✗ Hết hàng' }}
+              </div>
+            </div>
+          </a>
+        @endforeach
+      </div>
+    @else
+      <p style="text-align:center;color:#999;padding:20px">
+        Không có sản phẩm liên quan
+      </p>
     @endif
   </div>
 </div>
@@ -194,6 +225,7 @@
 <script defer src="{{ asset('js/cart.js') }}"></script>
 <script defer src="{{ asset('js/auth.js') }}"></script>
 <script defer src="{{ asset('js/header.js') }}"></script>
+<script defer src="{{ asset('js/categories.js') }}"></script>
 <script defer src="{{ asset('js/product-detail.js') }}"></script>
 
 </body>

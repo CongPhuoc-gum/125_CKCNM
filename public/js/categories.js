@@ -14,19 +14,20 @@ async function loadCategories() {
         const menuDropdown = document.getElementById('dropdown-menu');
         if (!menuDropdown) return;
 
-        // Find the position after "Tất Cả Sản Phẩm" to insert categories
+        // Find the "Tất Cả Sản Phẩm" link
         const allProductsLink = Array.from(menuDropdown.children).find(item =>
             item.textContent.includes('Tất Cả Sản Phẩm')
         );
 
-        // Remove existing hardcoded category items (between "Tất Cả Sản Phẩm" and "Liên Hệ")
-        const hardcodedItems = menuDropdown.querySelectorAll('.menu-item:not([href="#products"]):not([href="#best"]):not([href="#contact"])');
-        hardcodedItems.forEach(item => item.remove());
+        if (!allProductsLink) {
+            console.error('Could not find "Tất Cả Sản Phẩm" link');
+            return;
+        }
 
         // Insert categories dynamically after "Tất Cả Sản Phẩm"
         categories.forEach(category => {
             const categoryLink = document.createElement('a');
-            categoryLink.href = `#category-${category.categoryId}`;
+            categoryLink.href = `${window.location.origin}?category=${category.categoryId}`;
             categoryLink.className = 'menu-item category-link';
             categoryLink.dataset.categoryId = category.categoryId;
 
@@ -34,19 +35,17 @@ async function loadCategories() {
             const emoji = getCategoryEmoji(category.name);
             categoryLink.textContent = `${emoji} ${category.name}`;
 
-            // Add click handler to filter products by category
-            categoryLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                filterProductsByCategory(category.categoryId, category.name);
-            });
-
-            // Insert after "Tất Cả Sản Phẩm"
-            if (allProductsLink && allProductsLink.nextSibling) {
-                menuDropdown.insertBefore(categoryLink, allProductsLink.nextSibling);
+            // Insert after the last category or after "Tất Cả Sản Phẩm"
+            const lastCategory = menuDropdown.querySelector('.category-link:last-of-type');
+            if (lastCategory) {
+                lastCategory.after(categoryLink);
             } else {
-                menuDropdown.appendChild(categoryLink);
+                allProductsLink.after(categoryLink);
             }
         });
+
+        // Highlight active category on page load
+        highlightActiveCategory();
 
     } catch (error) {
         console.error('Error loading categories:', error);
@@ -61,25 +60,12 @@ function getCategoryEmoji(categoryName) {
     if (name.includes('trái cây') || name.includes('sấy')) return '🍊';
     if (name.includes('kẹo')) return '🍬';
     if (name.includes('bánh')) return '🍪';
+    if (name.includes('bò')) return '🥩';
+    if (name.includes('tôm')) return '🦐';
     return '🏷️'; // Default emoji
 }
 
-function filterProductsByCategory(categoryId, categoryName) {
-    // Reload page with category filter
-    const url = new URL(window.location.href);
-
-    if (categoryId) {
-        url.searchParams.set('category', categoryId);
-    } else {
-        url.searchParams.delete('category');
-    }
-
-    // Reload with new URL
-    window.location.href = url.toString();
-}
-
-// Highlight active category on page load
-window.addEventListener('DOMContentLoaded', () => {
+function highlightActiveCategory() {
     const urlParams = new URLSearchParams(window.location.search);
     const activeCategoryId = urlParams.get('category');
 
@@ -93,7 +79,11 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
 
 // Load categories when page loads
-window.addEventListener('DOMContentLoaded', loadCategories);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadCategories);
+} else {
+    loadCategories();
+}
