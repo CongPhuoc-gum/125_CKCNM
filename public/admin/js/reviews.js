@@ -61,9 +61,6 @@ function displayReviews(reviews) {
             </td>
             <td>${formatDate(review.createdAt)}</td>
             <td>
-                <button onclick="viewReviewDetail(${review.reviewId})" class="btn btn-sm btn-primary" title="Xem chi tiết">
-                    <i class="fas fa-eye"></i>
-                </button>
                 <button onclick="deleteReview(${review.reviewId})" class="btn btn-sm btn-danger" title="Xóa">
                     <i class="fas fa-trash"></i>
                 </button>
