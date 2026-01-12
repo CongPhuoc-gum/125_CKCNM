@@ -395,6 +395,7 @@ if (!window.API_URL) window.API_URL = '/api';
             if (result.success) {
                 showToast('⭐ Cảm ơn bạn đã đánh giá!');
                 closeReviewModal();
+                loadOrders(); // Refresh status
             } else {
                 showToast('❌ ' + (result.message || 'Không thể gửi đánh giá'), 'error');
             }
@@ -413,7 +414,7 @@ if (!window.API_URL) window.API_URL = '/api';
             completed: { text: 'Hoàn thành', icon: '✅' },
             cancelled: { text: 'Đã hủy', icon: '❌' }
         };
-        return statuses[status] || { text: status, icon: '📦' };
+        return statuses[status] || { text: status || 'Chờ xử lý', icon: '📦' };
     }
 
     function formatDate(dateStr) {

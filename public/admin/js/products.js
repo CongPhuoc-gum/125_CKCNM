@@ -144,7 +144,7 @@ function searchProducts() {
 }
 
 // Delete product
-// ✅ HÀM XÓA SẢN PHẨM - ĐẦY ĐỦ
+// HÀM XÓA SẢN PHẨM - ĐẦY ĐỦ
 async function deleteProduct(productId) {
     if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
         return;

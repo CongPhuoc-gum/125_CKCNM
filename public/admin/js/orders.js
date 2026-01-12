@@ -91,7 +91,7 @@ function displayOrders(orders) {
 async function viewOrderDetail(orderId) {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/orders/${orderId}`, {
+        const response = await fetch(`${API_URL}/orders/detail/${orderId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
