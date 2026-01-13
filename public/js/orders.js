@@ -38,7 +38,7 @@ if (!window.API_URL) window.API_URL = '/api';
         });
     }
 
-    // ===== LOAD ORDERS =====
+    // ===== LOAD ORDERS - FIXED ENDPOINT =====
     async function loadOrders() {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
@@ -46,7 +46,8 @@ if (!window.API_URL) window.API_URL = '/api';
                 throw new Error('User not found');
             }
 
-            const res = await fetch(`${API_URL}/orders/${user.userId}`, {
+            // FIXED: Đổi endpoint từ /orders/{userId} thành /user/{userId}/orders
+            const res = await fetch(`${API_URL}/user/${user.userId}/orders`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Accept': 'application/json'
@@ -56,6 +57,7 @@ if (!window.API_URL) window.API_URL = '/api';
             if (!res.ok) throw new Error('Failed to load orders');
 
             allOrders = await res.json();
+            console.log('Loaded orders:', allOrders);
             renderOrders();
 
         } catch (e) {
@@ -217,10 +219,11 @@ if (!window.API_URL) window.API_URL = '/api';
         }
     };
 
-    // ===== VIEW ORDER DETAIL =====
+    // ===== VIEW ORDER DETAIL - FIXED ENDPOINT =====
     window.viewOrderDetail = async function (orderId) {
         try {
-            const res = await fetch(`${API_URL}/orders/detail/${orderId}`, {
+            // FIXED: Đổi endpoint từ /orders/detail/{id} thành /orders/{id}
+            const res = await fetch(`${API_URL}/orders/${orderId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Accept': 'application/json'
@@ -230,6 +233,7 @@ if (!window.API_URL) window.API_URL = '/api';
             if (!res.ok) throw new Error('Failed to load detail');
 
             const order = await res.json();
+            console.log('Order detail:', order);
             showOrderDetailModal(order);
 
         } catch (e) {

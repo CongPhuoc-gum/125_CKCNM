@@ -52,10 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/remove/{cartItemId}', [CartController::class, 'removeItem']);
     });
 
-    // Orders
+    // Orders - FIXED: Đổi thứ tự để tránh conflict
     Route::post('/checkout', [OrderController::class, 'checkout']);
-    Route::get('/orders/{userId}', [OrderController::class, 'index']);
-    Route::get('/orders/detail/{id}', [OrderController::class, 'show']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']); // Route cụ thể lên trước
+    Route::get('/user/{userId}/orders', [OrderController::class, 'index']); // Route user orders
     Route::put('/orders/{id}/complete', [OrderController::class, 'complete']);
     Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 

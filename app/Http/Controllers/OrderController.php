@@ -20,6 +20,10 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
+    /**
+     * Chi tiết đơn hàng - FIX: Load đầy đủ relationships
+     * GET /api/orders/{id}
+     */
     public function show($id)
     {
         $order = Order::with(['items.product', 'payment'])->find($id);
@@ -28,7 +32,42 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        return response()->json($order);
+        // Transform data to ensure all fields are present
+        $orderData = [
+            'orderId' => $order->orderId,
+            'userId' => $order->userId,
+            'customerName' => $order->customerName ?? 'N/A',
+            'phone' => $order->phone ?? 'N/A',
+            'email' => $order->email ?? null,
+            'shippingAddress' => $order->shippingAddress ?? 'N/A',
+            'note' => $order->note ?? null,
+            'totalAmount' => $order->totalAmount ?? 0,
+            'status' => $order->status ?? 'pending',
+            'createdAt' => $order->createdAt,
+            'updatedAt' => $order->updatedAt,
+            'items' => $order->items->map(function($item) {
+                return [
+                    'orderItemId' => $item->orderItemId,
+                    'productId' => $item->productId,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'product' => $item->product ? [
+                        'productId' => $item->product->productId,
+                        'name' => $item->product->name,
+                        'imageUrl' => $item->product->imageUrl,
+                    ] : null
+                ];
+            }),
+            'payment' => $order->payment ? [
+                'paymentId' => $order->payment->paymentId,
+                'method' => $order->payment->method,
+                'amount' => $order->payment->amount,
+                'status' => $order->payment->status,
+                'transactionCode' => $order->payment->transactionCode,
+            ] : null
+        ];
+
+        return response()->json($orderData);
     }
 
     /**
@@ -353,8 +392,10 @@ class OrderController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('customerName', 'like', '%' . $request->search . '%')
-                ->orWhere('phone', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('customerName', 'like', '%' . $request->search . '%')
+                  ->orWhere('phone', 'like', '%' . $request->search . '%');
+            });
         }
 
         if ($request->filled('from_date')) {
@@ -399,20 +440,37 @@ class OrderController extends Controller
 
     public function statistics(Request $request)
     {
-        $fromDate = $request->input('from_date', now()->subMonth());
-        $toDate = $request->input('to_date', now());
-
-        $stats = [
-            'total_orders' => Order::whereBetween('createdAt', [$fromDate, $toDate])->count(),
-            'pending' => Order::where('status', 'pending')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-            'processing' => Order::where('status', 'processing')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-            'shipping' => Order::where('status', 'shipping')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-            'completed' => Order::where('status', 'completed')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-            'cancelled' => Order::where('status', 'cancelled')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
-            'total_revenue' => Order::whereIn('status', ['completed', 'processing', 'shipping'])
-                ->whereBetween('createdAt', [$fromDate, $toDate])
-                ->sum('totalAmount'),
-        ];
+        // Nếu có from_date và to_date thì filter, không thì lấy ALL
+        $query = Order::query();
+        
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $fromDate = $request->input('from_date');
+            $toDate = $request->input('to_date');
+            
+            $stats = [
+                'total_orders' => Order::whereBetween('createdAt', [$fromDate, $toDate])->count(),
+                'pending' => Order::where('status', 'pending')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+                'processing' => Order::where('status', 'processing')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+                'shipping' => Order::where('status', 'shipping')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+                'completed' => Order::where('status', 'completed')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+                'cancelled' => Order::where('status', 'cancelled')->whereBetween('createdAt', [$fromDate, $toDate])->count(),
+                'total_revenue' => Order::whereIn('status', ['completed', 'processing', 'shipping'])
+                    ->whereBetween('createdAt', [$fromDate, $toDate])
+                    ->sum('totalAmount'),
+            ];
+        } else {
+            // Mặc định lấy TẤT CẢ
+            $stats = [
+                'total_orders' => Order::count(),
+                'pending' => Order::where('status', 'pending')->count(),
+                'processing' => Order::where('status', 'processing')->count(),
+                'shipping' => Order::where('status', 'shipping')->count(),
+                'completed' => Order::where('status', 'completed')->count(),
+                'cancelled' => Order::where('status', 'cancelled')->count(),
+                'total_revenue' => Order::whereIn('status', ['completed', 'processing', 'shipping'])
+                    ->sum('totalAmount'),
+            ];
+        }
 
         return response()->json([
             'success' => true,
