@@ -1,66 +1,114 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <h1 align="center">🍿 Snack Food Shop</h1>
+  <p align="center">
+    Hệ Thống Thương Mại Điện Tử Đồ Khô<br/>
+    Xây dựng trên nền tảng <strong>Laravel API Backend</strong>
+  </p>
 </p>
 
-## About Laravel
+<hr/>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<h2>📌 Giới thiệu</h2>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p>
+  <strong>Snack Food Shop</strong> là dự án xây dựng hệ thống bán lẻ
+  <strong>thực phẩm khô, hạt dinh dưỡng và trái cây sấy</strong>.
+  Hệ thống cung cấp giải pháp quản lý kho chuyên nghiệp và trải nghiệm
+  mua sắm trực tuyến an toàn, hiện đại.
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+<ul>
+  <li><strong>Tên dự án:</strong> Snack Food Shop</li>
+  <li><strong>Mục tiêu:</strong> Nền tảng bán lẻ đồ khô với thanh toán và xác thực hiện đại</li>
+  <li><strong>Điểm nổi bật:</strong> Thanh toán đa phương thức & Đăng nhập Google OAuth</li>
+</ul>
 
-## Learning Laravel
+<hr/>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+<h2>⚙️ Công nghệ sử dụng</h2>
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+<ul>
+  <li><strong>Framework:</strong> Laravel 9.x</li>
+  <li><strong>Ngôn ngữ:</strong> PHP 8.x</li>
+  <li><strong>Cơ sở dữ liệu:</strong> MySQL (dbsnackshop)</li>
+  <li><strong>Xác thực:</strong> Laravel Sanctum, OTP Email</li>
+  <li><strong>Dịch vụ tích hợp:</strong> VNPay, Stripe, Google Console</li>
+</ul>
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+<hr/>
 
-## Laravel Sponsors
+<h2>🚀 Các chức năng chính</h2>
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+<h3>1. Quản lý Sản phẩm Snack & Đồ khô</h3>
+<ul>
+  <li>Danh mục: Hạt dinh dưỡng, Trái cây sấy, Snack ăn liền</li>
+  <li>Chi tiết sản phẩm: Khối lượng, hạn sử dụng, bảo quản</li>
+  <li>Kho hàng: Kiểm tra tồn kho thời gian thực</li>
+</ul>
 
-### Premium Partners
+<h3>2. Chức năng Khách hàng</h3>
+<ul>
+  <li>Đăng ký tài khoản & xác thực OTP qua Email</li>
+  <li>Đăng nhập Google OAuth</li>
+  <li>Giỏ hàng: Quản lý sản phẩm & tính tổng tiền tự động</li>
+  <li>Thanh toán: COD, VNPay, Stripe</li>
+  <li>Theo dõi đơn hàng & lịch sử mua</li>
+</ul>
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+<h3>3. Quản trị hệ thống (Admin)</h3>
+<ul>
+  <li>Thống kê doanh thu & đơn hàng</li>
+  <li>Quản lý sản phẩm, danh mục, kho hàng</li>
+  <li>Xử lý và cập nhật trạng thái đơn hàng</li>
+</ul>
 
-## Contributing
+<hr/>
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+<h2>🗂️ Cấu trúc dự án</h2>
 
-## Code of Conduct
+<pre>
+app/Http/Controllers   - Auth, Cart, Order
+app/Models             - User, Product, Order
+app/Services           - OTP, Payment
+routes/api.php         - API Endpoints
+</pre>
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+<hr/>
 
-## Security Vulnerabilities
+<h2>🛠️ Hướng dẫn cài đặt</h2>
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+<p><strong>Clone dự án:</strong></p>
+<pre>
+git clone https://github.com/CongPhuoc-gum/125_CKCNM.git
+</pre>
 
-## License
+<p><strong>Cài đặt thư viện:</strong></p>
+<pre>
+composer install
+</pre>
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<p><strong>Thiết lập môi trường:</strong></p>
+<pre>
+DB_PORT=3307
+DB_DATABASE=dbsnackshop
+DB_PASSWORD=Abc123456@
+</pre>
+
+<p><strong>Khởi tạo hệ thống:</strong></p>
+<pre>
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+</pre>
+
+<p><strong>Chạy ứng dụng:</strong></p>
+<pre>
+php artisan serve
+</pre>
+
+<hr/>
+
+<h2>📄 License</h2>
+<p>
+  Dự án được phát triển phục vụ mục đích học tập và nghiên cứu với Laravel.
+</p>
