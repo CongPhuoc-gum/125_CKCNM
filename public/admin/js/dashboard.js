@@ -23,7 +23,7 @@ async function loadDashboard() {
         const data = result.data;
 
         // Update stats
-        document.getElementById('totalRevenue').textContent = 
+        document.getElementById('totalRevenue').textContent =
             new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.stats.total_revenue);
         document.getElementById('totalOrders').textContent = data.stats.total_orders;
         document.getElementById('pendingOrders').textContent = data.stats.pending_orders;
@@ -48,7 +48,7 @@ async function loadDashboard() {
 
 function loadTopProducts(products) {
     const tbody = document.getElementById('topProductsTable');
-    
+
     if (!products || products.length === 0) {
         tbody.innerHTML = '<tr><td colspan="2" class="text-center">Chưa có dữ liệu</td></tr>';
         return;
@@ -64,7 +64,7 @@ function loadTopProducts(products) {
 
 function loadRecentOrders(orders) {
     const tbody = document.getElementById('recentOrdersTable');
-    
+
     if (!orders || orders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center">Chưa có đơn hàng</td></tr>';
         return;
@@ -81,7 +81,7 @@ function loadRecentOrders(orders) {
 
 function loadLowStockProducts(products) {
     const tbody = document.getElementById('lowStockTable');
-    
+
     if (!products || products.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tất cả sản phẩm đều đủ hàng</td></tr>';
         return;

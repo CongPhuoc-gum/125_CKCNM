@@ -105,11 +105,13 @@
 @section('scripts')
 <script>
 const API_URL = window.location.origin + '/api';
-const orderId = window.location.pathname.split('/')[3];
+const orderId = window.location.pathname.split('/').pop();
 
 async function loadOrderDetail() {
     try {
         const token = localStorage.getItem('token');
+        
+        // Fixed endpoint: /api/orders/{id}
         const response = await fetch(`${API_URL}/orders/${orderId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -117,7 +119,12 @@ async function loadOrderDetail() {
             }
         });
 
+        if (!response.ok) {
+            throw new Error('Failed to load order');
+        }
+
         const order = await response.json();
+        console.log('Order data:', order);
 
         // Update order info
         document.getElementById('orderIdTitle').textContent = order.orderId;
@@ -127,9 +134,9 @@ async function loadOrderDetail() {
         document.getElementById('orderTotal').textContent = formatCurrency(order.totalAmount);
 
         // Customer info
-        document.getElementById('customerName').textContent = order.customerName;
-        document.getElementById('customerPhone').textContent = order.phone;
-        document.getElementById('shippingAddress').textContent = order.shippingAddress;
+        document.getElementById('customerName').textContent = order.customerName || 'N/A';
+        document.getElementById('customerPhone').textContent = order.phone || 'N/A';
+        document.getElementById('shippingAddress').textContent = order.shippingAddress || 'N/A';
 
         // Note
         if (order.note) {
@@ -149,6 +156,8 @@ async function loadOrderDetail() {
                 'stripe': 'Stripe'
             };
             document.getElementById('paymentMethod').textContent = methodNames[order.payment.method] || order.payment.method;
+        } else {
+            document.getElementById('paymentMethod').textContent = 'N/A';
         }
 
         // Order items
@@ -195,7 +204,7 @@ function displayOrderItems(items) {
                         `<img src="/storage/${item.product.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" alt="${item.product.name}">` 
                         : ''
                     }
-                    <span>${item.product ? item.product.name : 'N/A'}</span>
+                    <span>${item.product ? (item.product.name || 'N/A') : 'N/A'}</span>
                 </div>
             </td>
             <td>${formatCurrency(item.price)}</td>
@@ -228,7 +237,7 @@ async function updateStatus() {
 
         const data = await response.json();
 
-        if (response.ok) {
+        if (response.ok && data.success) {
             alert('Cập nhật trạng thái thành công!');
             location.reload();
         } else {
@@ -244,21 +253,25 @@ function getStatusBadge(status) {
     const badges = {
         'pending': '<span class="badge badge-warning">Chờ xử lý</span>',
         'processing': '<span class="badge badge-primary">Đang xử lý</span>',
-        'shipping': '<span class="badge badge-primary">Đang giao</span>',
+        'shipping': '<span class="badge badge-info">Đang giao</span>',
         'completed': '<span class="badge badge-success">Hoàn thành</span>',
         'cancelled': '<span class="badge badge-danger">Đã hủy</span>'
     };
-    return badges[status] || status;
+    return badges[status] || `<span class="badge">${status}</span>`;
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
 }
 
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleString('vi-VN');
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleString('vi-VN');
+    } catch(e) {
+        return 'N/A';
+    }
 }
 
 window.addEventListener('DOMContentLoaded', loadOrderDetail);
